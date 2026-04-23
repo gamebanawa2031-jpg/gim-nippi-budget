@@ -236,7 +236,7 @@ export const FinanceProvider = ({ children }) => {
   const [weddingTasks, setWeddingTasks] = useState([]);
   const [weddingOverallBudget, setWeddingOverallBudget] = useState(2500000);
   const [loans, setLoans] = useState([]);
-  const [appName, setAppName] = useState('Gim & Nippi Budget');
+  const [appName, setAppNameState] = useState('Gim & Nippi Budget');
 
   // Handle Auth & Cloud Sync
   useEffect(() => {
@@ -261,7 +261,7 @@ export const FinanceProvider = ({ children }) => {
           setWeddingTasks(data.weddingTasks || []);
           setWeddingOverallBudget(data.weddingOverallBudget || 2500000);
           setLoans(data.loans || []);
-          setAppName(data.appName || 'Gim & Nippi Budget');
+          setAppNameState(data.appName || 'Gim & Nippi Budget');
           
           // One-time check for migration
           if (localStorage.getItem('finance_transactions') && (data.transactions || []).length === 0) {
