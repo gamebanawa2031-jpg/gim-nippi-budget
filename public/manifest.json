@@ -1,0 +1,16 @@
+{
+  "short_name": "Gim&Nippi",
+  "name": "Gim & Nippi Budget",
+  "icons": [
+    {
+      "src": "/fintrack_app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#6366f1",
+  "background_color": "#0f172a"
+}
