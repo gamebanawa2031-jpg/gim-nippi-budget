@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useFinance, formatCurrency } from '../context/FinanceContext';
-import { TrendingUp, TrendingDown, Wallet, Plus, Calendar, CreditCard, Target } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Plus, Calendar, CreditCard, Target, FileText } from 'lucide-react';
+import { generatePDFReport } from '../utils/PDFReportService';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import TransactionForm from './TransactionForm';
 
 const Dashboard = () => {
-  const { totalIncome, totalExpense, balance, todayExpense, transactions, dailyExpenditure, totalCardDebt, totalSavings, goals } = useFinance();
+  const { 
+    totalIncome, totalExpense, balance, todayExpense, transactions, 
+    dailyExpenditure, totalCardDebt, totalSavings, goals,
+    creditCards, weddingTotalBudget, weddingTotalSpent, appName, user
+  } = useFinance();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Prepare data for category pie chart
@@ -35,10 +40,20 @@ const Dashboard = () => {
           <h1 className="text-gradient">Financial Overview</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Here's your summary for this month.</p>
         </div>
-        <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} />
-          Add Transaction
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="btn-secondary" onClick={() => generatePDFReport({
+            transactions, totalIncome, totalExpense, balance, 
+            totalCardDebt, totalSavings, creditCards, goals,
+            weddingTotalBudget, weddingTotalSpent, appName, user
+          })}>
+            <FileText size={20} />
+            Download Report
+          </button>
+          <button className="btn-primary" onClick={() => setIsModalOpen(true)}>
+            <Plus size={20} />
+            Add Transaction
+          </button>
+        </div>
       </div>
 
       <div className="dashboard-grid">
