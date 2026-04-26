@@ -347,16 +347,14 @@ export const FinanceProvider = ({ children }) => {
     
     const updatedGoals = goals.map(g => g.id === goalId ? { ...g, current: g.current + amount } : g);
     
-    const newTx = {
+    const updatedTransactions = [{
       id: Date.now().toString(),
       type: 'expense',
       category: 'Saving',
       amount: Number(amount),
       description: `Saving for ${goal.title}`,
-      date: new Date().toISOString().split('T')[0]
-    };
-    
-    const updatedTransactions = [newTx, ...transactions];
+      date: new Date().toLocaleDateString('en-CA')
+    }, ...transactions];
     
     await updateDoc(getDocRef(), { 
       goals: updatedGoals,
@@ -520,12 +518,16 @@ export const FinanceProvider = ({ children }) => {
         category: 'Debt',
         amount: Number(transaction.amount),
         description: `Credit Card Repayment: ${card.name}`,
-        date: transaction.date
+        date: transaction.date || new Date().toLocaleDateString('en-CA')
       };
       updates.transactions = [mainTx, ...transactions];
     }
 
-    await updateDoc(getDocRef(), { ...updates });
+    try {
+      await updateDoc(getDocRef(), updates);
+    } catch (error) {
+      console.error("Error updating credit card transaction:", error);
+    }
   };
 
   const deleteCardTransaction = async (cardId, transactionId) => {
@@ -558,13 +560,13 @@ export const FinanceProvider = ({ children }) => {
   };
 
   // ===== DERIVED STATE (Remains same, based on cloud-synced state) =====
-  const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount), 0);
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount), 0);
+  const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
   const balance = totalIncome - totalExpense;
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = new Date().toLocaleDateString('en-CA');
   const todayExpense = transactions
     .filter(t => t.type === 'expense' && t.date === todayStr)
-    .reduce((acc, t) => acc + Number(t.amount), 0);
+    .reduce((acc, t) => acc + Number(t.amount || 0), 0);
 
   const dailyExpenditure = useMemo(() => {
     const days = {};
