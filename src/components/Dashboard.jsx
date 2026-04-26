@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useFinance, formatCurrency } from '../context/FinanceContext';
-import { TrendingUp, TrendingDown, Wallet, Plus, Calendar, CreditCard } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Plus, Calendar, CreditCard, Target } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import TransactionForm from './TransactionForm';
 
 const Dashboard = () => {
-  const { totalIncome, totalExpense, balance, todayExpense, transactions, dailyExpenditure, totalCardDebt } = useFinance();
+  const { totalIncome, totalExpense, balance, todayExpense, transactions, dailyExpenditure, totalCardDebt, totalSavings, goals } = useFinance();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Prepare data for category pie chart
@@ -81,6 +81,14 @@ const Dashboard = () => {
           </div>
           <div className="summary-card-value">{formatCurrency(totalCardDebt)}</div>
         </div>
+
+        <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--accent-primary)' }}>
+          <div className="summary-card-header">
+            <span>Total Savings</span>
+            <Target size={20} color="var(--accent-primary)" />
+          </div>
+          <div className="summary-card-value">{formatCurrency(totalSavings)}</div>
+        </div>
       </div>
 
       {/* Daily Expenditure Chart */}
@@ -149,6 +157,37 @@ const Dashboard = () => {
         </div>
 
         <div className="panel glass-panel">
+          <h2 className="panel-title" style={{ marginBottom: '20px' }}>Savings Progress</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {goals.slice(0, 3).map(goal => (
+              <div key={goal.id}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <span style={{ fontWeight: 500 }}>{goal.title}</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                    {formatCurrency(goal.current)} / {formatCurrency(goal.target)}
+                  </span>
+                </div>
+                <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div 
+                    style={{ 
+                      height: '100%', 
+                      width: `${Math.min((goal.current / goal.target) * 100, 100)}%`,
+                      background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-secondary))',
+                      borderRadius: '4px'
+                    }} 
+                  />
+                </div>
+              </div>
+            ))}
+            {goals.length === 0 && (
+              <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '20px' }}>
+                No active savings goals.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="panel glass-panel" style={{ gridColumn: 'span 2' }}>
           <div className="panel-header">
             <h2 className="panel-title">Recent Transactions</h2>
           </div>

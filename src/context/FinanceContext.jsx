@@ -342,8 +342,26 @@ export const FinanceProvider = ({ children }) => {
   };
 
   const addGoalAmount = async (goalId, amount) => {
-    const updated = goals.map(g => g.id === goalId ? { ...g, current: g.current + amount } : g);
-    await updateDoc(getDocRef(), { goals: updated });
+    const goal = goals.find(g => g.id === goalId);
+    if (!goal) return;
+    
+    const updatedGoals = goals.map(g => g.id === goalId ? { ...g, current: g.current + amount } : g);
+    
+    const newTx = {
+      id: Date.now().toString(),
+      type: 'expense',
+      category: 'Saving',
+      amount: Number(amount),
+      description: `Saving for ${goal.title}`,
+      date: new Date().toISOString().split('T')[0]
+    };
+    
+    const updatedTransactions = [newTx, ...transactions];
+    
+    await updateDoc(getDocRef(), { 
+      goals: updatedGoals,
+      transactions: updatedTransactions
+    });
   };
 
   const resetGoalAmount = async (goalId) => {
@@ -473,21 +491,41 @@ export const FinanceProvider = ({ children }) => {
   };
 
   const addCardTransaction = async (cardId, transaction) => {
-    const updated = creditCards.map(card => {
-      if (card.id === cardId) {
-        const newTx = { ...transaction, id: Date.now().toString() };
+    const card = creditCards.find(c => c.id === cardId);
+    if (!card) return;
+
+    const newTxId = Date.now().toString();
+    const updatedCards = creditCards.map(c => {
+      if (c.id === cardId) {
+        const newCardTx = { ...transaction, id: newTxId };
         const newBalance = transaction.type === 'payment' 
-          ? card.balance + Number(transaction.amount)
-          : card.balance - Number(transaction.amount);
+          ? c.balance + Number(transaction.amount)
+          : c.balance - Number(transaction.amount);
         return { 
-          ...card, 
+          ...c, 
           balance: newBalance,
-          transactions: [newTx, ...card.transactions] 
+          transactions: [newCardTx, ...c.transactions] 
         };
       }
-      return card;
+      return c;
     });
-    await updateDoc(getDocRef(), { creditCards: updated });
+
+    const updates = { creditCards: updatedCards };
+
+    // If it's a repayment, also add it to main transactions as an expense
+    if (transaction.type === 'repayment') {
+      const mainTx = {
+        id: (Date.now() + 1).toString(),
+        type: 'expense',
+        category: 'Debt',
+        amount: Number(transaction.amount),
+        description: `Credit Card Repayment: ${card.name}`,
+        date: transaction.date
+      };
+      updates.transactions = [mainTx, ...transactions];
+    }
+
+    await updateDoc(getDocRef(), { ...updates });
   };
 
   const deleteCardTransaction = async (cardId, transactionId) => {
@@ -594,6 +632,7 @@ export const FinanceProvider = ({ children }) => {
       incomeCategories, expenseCategories, addCategory, deleteCategory,
       creditCards, addCreditCard, deleteCreditCard, addCardTransaction, deleteCardTransaction,
       totalCardDebt: creditCards.reduce((acc, card) => acc + card.balance, 0),
+      totalSavings: goals.reduce((acc, goal) => acc + goal.current, 0),
     }}>
       {children}
     </FinanceContext.Provider>
