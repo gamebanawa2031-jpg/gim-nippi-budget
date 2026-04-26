@@ -237,6 +237,9 @@ export const FinanceProvider = ({ children }) => {
   const [weddingOverallBudget, setWeddingOverallBudget] = useState(2500000);
   const [loans, setLoans] = useState([]);
   const [appName, setAppNameState] = useState('Gim & Nippi Budget');
+  const [incomeCategories, setIncomeCategories] = useState(['Salary', 'Fiverr', 'Investment', 'Other Income']);
+  const [expenseCategories, setExpenseCategories] = useState(['Housing', 'Food', 'Groceries', 'Transportation', 'Utilities', 'Insurance', 'Medical', 'Saving', 'Personal', 'Debt', 'Wedding', 'Other Expense']);
+  const [creditCards, setCreditCards] = useState([]);
 
   // Handle Auth & Cloud Sync
   useEffect(() => {
@@ -262,6 +265,9 @@ export const FinanceProvider = ({ children }) => {
           setWeddingOverallBudget(data.weddingOverallBudget || 2500000);
           setLoans(data.loans || []);
           setAppNameState(data.appName || 'Gim & Nippi Budget');
+          if (data.incomeCategories) setIncomeCategories(data.incomeCategories);
+          if (data.expenseCategories) setExpenseCategories(data.expenseCategories);
+          setCreditCards(data.creditCards || []);
           
           // One-time check for migration
           if (localStorage.getItem('finance_transactions') && (data.transactions || []).length === 0) {
@@ -428,6 +434,80 @@ export const FinanceProvider = ({ children }) => {
     await updateDoc(getDocRef(), { appName: name });
   };
 
+  // ===== NEW ACTIONS FOR CATEGORIES & CREDIT CARDS =====
+  
+  const addCategory = async (type, name) => {
+    if (type === 'income') {
+      const updated = [...incomeCategories, name];
+      await updateDoc(getDocRef(), { incomeCategories: updated });
+    } else {
+      const updated = [...expenseCategories, name];
+      await updateDoc(getDocRef(), { expenseCategories: updated });
+    }
+  };
+
+  const deleteCategory = async (type, name) => {
+    if (type === 'income') {
+      const updated = incomeCategories.filter(c => c !== name);
+      await updateDoc(getDocRef(), { incomeCategories: updated });
+    } else {
+      const updated = expenseCategories.filter(c => c !== name);
+      await updateDoc(getDocRef(), { expenseCategories: updated });
+    }
+  };
+
+  const addCreditCard = async (card) => {
+    const newCard = { 
+      ...card, 
+      id: Date.now().toString(), 
+      balance: 0, 
+      transactions: [] 
+    };
+    const updated = [...creditCards, newCard];
+    await updateDoc(getDocRef(), { creditCards: updated });
+  };
+
+  const deleteCreditCard = async (id) => {
+    const updated = creditCards.filter(c => c.id !== id);
+    await updateDoc(getDocRef(), { creditCards: updated });
+  };
+
+  const addCardTransaction = async (cardId, transaction) => {
+    const updated = creditCards.map(card => {
+      if (card.id === cardId) {
+        const newTx = { ...transaction, id: Date.now().toString() };
+        const newBalance = transaction.type === 'payment' 
+          ? card.balance + Number(transaction.amount)
+          : card.balance - Number(transaction.amount);
+        return { 
+          ...card, 
+          balance: newBalance,
+          transactions: [newTx, ...card.transactions] 
+        };
+      }
+      return card;
+    });
+    await updateDoc(getDocRef(), { creditCards: updated });
+  };
+
+  const deleteCardTransaction = async (cardId, transactionId) => {
+    const updated = creditCards.map(card => {
+      if (card.id === cardId) {
+        const tx = card.transactions.find(t => t.id === transactionId);
+        const newBalance = tx.type === 'payment'
+          ? card.balance - Number(tx.amount)
+          : card.balance + Number(tx.amount);
+        return {
+          ...card,
+          balance: newBalance,
+          transactions: card.transactions.filter(t => t.id !== transactionId)
+        };
+      }
+      return card;
+    });
+    await updateDoc(getDocRef(), { creditCards: updated });
+  };
+
   const resetAllData = async () => {
     await updateDoc(getDocRef(), {
       transactions: [],
@@ -511,6 +591,9 @@ export const FinanceProvider = ({ children }) => {
       dailyExpenditure, spendingByCategory, weeklyTrend,
       resetAllData,
       appName, setAppName,
+      incomeCategories, expenseCategories, addCategory, deleteCategory,
+      creditCards, addCreditCard, deleteCreditCard, addCardTransaction, deleteCardTransaction,
+      totalCardDebt: creditCards.reduce((acc, card) => acc + card.balance, 0),
     }}>
       {children}
     </FinanceContext.Provider>

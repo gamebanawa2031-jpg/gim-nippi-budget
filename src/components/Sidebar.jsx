@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Receipt, Target, Heart, Landmark, BarChart3, Wallet, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, Receipt, Target, Heart, Landmark, BarChart3, Wallet, LogOut, User, CreditCard } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useFinance, getDaysUntilWedding, WEDDING_DATE } from '../context/FinanceContext';
@@ -13,6 +13,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     { id: 'transactions', label: 'Transactions', icon: <Receipt size={20} /> },
     { id: 'wedding', label: 'Wedding Planner', icon: <Heart size={20} />, tabClass: 'wedding-tab' },
     { id: 'loans', label: 'Loan Manager', icon: <Landmark size={20} />, tabClass: 'loan-tab' },
+    { id: 'credit-cards', label: 'Credit Cards', icon: <CreditCard size={20} />, tabClass: 'cc-tab' },
     { id: 'goals', label: 'Goals & Savings', icon: <Target size={20} /> },
     { id: 'insights', label: 'Insights', icon: <BarChart3 size={20} />, tabClass: 'insight-tab' },
   ];

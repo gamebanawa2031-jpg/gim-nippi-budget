@@ -8,6 +8,7 @@ import TransactionList from './components/TransactionList';
 import GoalTracker from './components/GoalTracker';
 import WeddingPlanner from './components/WeddingPlanner';
 import LoanManager from './components/LoanManager';
+import CreditCardManager from './components/CreditCardManager';
 import Insights from './components/Insights';
 import Login from './components/Login';
 import './App.css';
@@ -44,6 +45,7 @@ function AppContent() {
       case 'transactions': return <TransactionList />;
       case 'wedding': return <WeddingPlanner />;
       case 'loans': return <LoanManager />;
+      case 'credit-cards': return <CreditCardManager />;
       case 'goals': return <GoalTracker />;
       case 'insights': return <Insights />;
       default: return <Dashboard />;

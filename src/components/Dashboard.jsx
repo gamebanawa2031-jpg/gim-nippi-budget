@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useFinance, formatCurrency } from '../context/FinanceContext';
-import { TrendingUp, TrendingDown, Wallet, Plus, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Plus, Calendar, CreditCard } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import TransactionForm from './TransactionForm';
 
 const Dashboard = () => {
-  const { totalIncome, totalExpense, balance, todayExpense, transactions, dailyExpenditure } = useFinance();
+  const { totalIncome, totalExpense, balance, todayExpense, transactions, dailyExpenditure, totalCardDebt } = useFinance();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Prepare data for category pie chart
@@ -72,6 +72,14 @@ const Dashboard = () => {
             <Calendar size={20} color="var(--warning)" />
           </div>
           <div className="summary-card-value">{formatCurrency(todayExpense)}</div>
+        </div>
+
+        <div className="summary-card glass-panel" style={{ borderTop: '4px solid #F43F5E' }}>
+          <div className="summary-card-header">
+            <span>CC Debt</span>
+            <CreditCard size={20} color="#F43F5E" />
+          </div>
+          <div className="summary-card-value">{formatCurrency(totalCardDebt)}</div>
         </div>
       </div>
 

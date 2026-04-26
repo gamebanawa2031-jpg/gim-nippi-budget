@@ -3,7 +3,7 @@ import { useFinance } from '../context/FinanceContext';
 import { X } from 'lucide-react';
 
 const TransactionForm = ({ isOpen, onClose, defaultType = 'expense' }) => {
-  const { addTransaction } = useFinance();
+  const { addTransaction, incomeCategories, expenseCategories, addCategory } = useFinance();
   
   const [formData, setFormData] = useState({
     type: defaultType,
@@ -12,6 +12,9 @@ const TransactionForm = ({ isOpen, onClose, defaultType = 'expense' }) => {
     date: new Date().toISOString().split('T')[0],
     description: ''
   });
+
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
 
   // Reset form when modal opens or defaultType changes
   useEffect(() => {
@@ -23,27 +26,40 @@ const TransactionForm = ({ isOpen, onClose, defaultType = 'expense' }) => {
         date: new Date().toISOString().split('T')[0],
         description: ''
       });
+      setIsCustomCategory(false);
+      setCustomCategory('');
     }
   }, [isOpen, defaultType]);
 
   if (!isOpen) return null;
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'category' && e.target.value === 'ADD_CUSTOM') {
+      setIsCustomCategory(true);
+      setFormData({ ...formData, category: '' });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    let finalCategory = formData.category;
+    if (isCustomCategory && customCategory) {
+      finalCategory = customCategory;
+      await addCategory(formData.type, customCategory);
+    }
+
     addTransaction({
       ...formData,
+      category: finalCategory,
       amount: Number(formData.amount)
     });
+    
     setFormData({ type: defaultType, amount: '', category: '', date: new Date().toISOString().split('T')[0], description: '' });
     onClose();
   };
-
-  const incomeCategories = ['Salary', 'Fiverr', 'Investment', 'Other Income'];
-  const expenseCategories = ['Housing', 'Food', 'Groceries', 'Transportation', 'Utilities', 'Insurance', 'Medical', 'Saving', 'Personal', 'Debt', 'Wedding', 'Other Expense'];
 
   const categories = formData.type === 'income' ? incomeCategories : expenseCategories;
 
@@ -114,18 +130,41 @@ const TransactionForm = ({ isOpen, onClose, defaultType = 'expense' }) => {
           
           <div className="form-group">
             <label>Category</label>
-            <select 
-              name="category" 
-              value={formData.category} 
-              onChange={handleChange} 
-              className="input-field" 
-              required
-            >
-              <option value="" disabled>Select category</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+            {!isCustomCategory ? (
+              <select 
+                name="category" 
+                value={formData.category} 
+                onChange={handleChange} 
+                className="input-field" 
+                required
+              >
+                <option value="" disabled>Select category</option>
+                {categories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+                <option value="ADD_CUSTOM" style={{ fontWeight: 'bold', color: 'var(--accent-primary)' }}>+ Add Custom Category</option>
+              </select>
+            ) : (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input 
+                  type="text" 
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+                  className="input-field"
+                  placeholder="Enter new category name"
+                  required
+                  autoFocus
+                />
+                <button 
+                  type="button" 
+                  className="btn-secondary" 
+                  onClick={() => setIsCustomCategory(false)}
+                  style={{ padding: '8px 12px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
           
           <div className="form-group">
