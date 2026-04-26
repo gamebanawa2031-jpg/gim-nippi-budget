@@ -215,7 +215,12 @@ const WeddingPlanner = () => {
                         <span className="wedding-category-badge">{task.category}</span>
                       </div>
                       <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        {formatCurrency(taskSpent)} / {formatCurrency(task.budgetAllocated)} • {task.items.length} items
+                        {formatCurrency(taskSpent)} paid • {task.budgetAllocated - taskSpent > 0 
+                          ? <span style={{ color: 'var(--wedding-primary)' }}>{formatCurrency(task.budgetAllocated - taskSpent)} still to pay</span> 
+                          : task.budgetAllocated - taskSpent < 0 
+                            ? <span style={{ color: 'var(--danger)' }}>Over budget by {formatCurrency(Math.abs(task.budgetAllocated - taskSpent))}</span>
+                            : <span style={{ color: 'var(--success)' }}>Fully paid</span>
+                        } • {task.items.length} items
                       </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
