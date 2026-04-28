@@ -15,7 +15,7 @@ const Dashboard = () => {
 
   // Prepare data for category pie chart
   const expenseByCategory = transactions
-    .filter(t => t.type === 'expense')
+    .filter(t => t.type === 'expense' && t.category !== 'Saving')
     .reduce((acc, t) => {
       acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
       return acc;

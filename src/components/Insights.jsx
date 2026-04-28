@@ -35,7 +35,7 @@ const Insights = () => {
   const highestSpendingDay = useMemo(() => {
     const dayTotals = {};
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    transactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense' && t.category !== 'Saving').forEach(t => {
       const day = dayNames[new Date(t.date).getDay()];
       dayTotals[day] = (dayTotals[day] || 0) + Number(t.amount);
     });
@@ -61,7 +61,7 @@ const Insights = () => {
         .filter(t => t.type === 'income' && t.date.startsWith(yearMonth))
         .reduce((s, t) => s + Number(t.amount), 0);
       const expense = transactions
-        .filter(t => t.type === 'expense' && t.date.startsWith(yearMonth))
+        .filter(t => t.type === 'expense' && t.category !== 'Saving' && t.date.startsWith(yearMonth))
         .reduce((s, t) => s + Number(t.amount), 0);
       months.push({ month: monthStr, income, expense });
     }
@@ -82,7 +82,7 @@ const Insights = () => {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${yearMonth}-${String(d).padStart(2, '0')}`;
       const dayExpense = transactions
-        .filter(t => t.type === 'expense' && t.date === dateStr)
+        .filter(t => t.type === 'expense' && t.category !== 'Saving' && t.date === dateStr)
         .reduce((s, t) => s + Number(t.amount), 0);
       cumulative += dayExpense;
       const isFuture = d > now.getDate();

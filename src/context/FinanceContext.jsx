@@ -357,7 +357,7 @@ export const FinanceProvider = ({ children }) => {
         const updatedGoals = goals.map(g => g.id === goalId ? { ...g, current: g.current + amount } : g);
         const mainTx = {
           id: `saving-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-          type: 'expense',
+          type: 'transfer',
           category: 'Saving',
           amount: Number(amount),
           description: `Saving for ${goal.title}`,
@@ -611,11 +611,12 @@ export const FinanceProvider = ({ children }) => {
 
   // ===== DERIVED STATE (Remains same, based on cloud-synced state) =====
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-  const totalExpense = transactions.filter(t => t.type === 'expense').reduce((acc, t) => acc + Number(t.amount || 0), 0);
-  const balance = totalIncome - totalExpense;
+  const totalExpense = transactions.filter(t => t.type === 'expense' && t.category !== 'Saving').reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const totalTransfers = transactions.filter(t => t.type === 'transfer' || (t.type === 'expense' && t.category === 'Saving')).reduce((acc, t) => acc + Number(t.amount || 0), 0);
+  const balance = totalIncome - totalExpense - totalTransfers;
   const todayStr = new Date().toLocaleDateString('en-CA');
   const todayExpense = transactions
-    .filter(t => t.type === 'expense' && t.date === todayStr)
+    .filter(t => t.type === 'expense' && t.date === todayStr && t.category !== 'Saving')
     .reduce((acc, t) => acc + Number(t.amount || 0), 0);
 
   const dailyExpenditure = useMemo(() => {
@@ -627,7 +628,7 @@ export const FinanceProvider = ({ children }) => {
       const key = d.toISOString().split('T')[0];
       days[key] = 0;
     }
-    transactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense' && t.category !== 'Saving').forEach(t => {
       if (days[t.date] !== undefined) days[t.date] += Number(t.amount);
     });
     let cumulative = 0;
@@ -639,7 +640,7 @@ export const FinanceProvider = ({ children }) => {
 
   const spendingByCategory = useMemo(() => {
     const cats = {};
-    transactions.filter(t => t.type === 'expense').forEach(t => {
+    transactions.filter(t => t.type === 'expense' && t.category !== 'Saving').forEach(t => {
       cats[t.category] = (cats[t.category] || 0) + Number(t.amount);
     });
     return Object.entries(cats).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
@@ -655,7 +656,7 @@ export const FinanceProvider = ({ children }) => {
       weekEnd.setDate(weekEnd.getDate() + 6);
       const weekLabel = `Week ${4 - w}`;
       const total = transactions
-        .filter(t => t.type === 'expense' && t.date >= weekStart.toISOString().split('T')[0] && t.date <= weekEnd.toISOString().split('T')[0])
+        .filter(t => t.type === 'expense' && t.category !== 'Saving' && t.date >= weekStart.toISOString().split('T')[0] && t.date <= weekEnd.toISOString().split('T')[0])
         .reduce((acc, t) => acc + Number(t.amount), 0);
       weeks.push({ week: weekLabel, expense: total });
     }
