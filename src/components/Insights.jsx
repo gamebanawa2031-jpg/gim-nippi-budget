@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useFinance, formatCurrency } from '../context/FinanceContext';
-import { TrendingUp, TrendingDown, Calendar, Target, Zap, AlertTriangle, PiggyBank, BarChart3, Settings, Trash2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Calendar, Target, Zap, AlertTriangle, PiggyBank, BarChart3, Settings, Trash2, Download, Upload } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell
@@ -9,8 +9,31 @@ import {
 const Insights = () => {
   const { 
     transactions, dailyExpenditure, spendingByCategory, weeklyTrend, 
-    totalIncome, totalExpense, appName, setAppName, resetAllData 
+    totalIncome, totalExpense, appName, setAppName, resetAllData,
+    exportAllData, importAllData
   } = useFinance();
+
+  const fileInputRef = React.useRef(null);
+
+  const handleImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const confirmed = window.confirm(`Restore backup from "${file.name}"? This will overwrite current data with the backup.`);
+      if (!confirmed) return;
+      const success = await importAllData(text);
+      if (success) {
+        alert('✅ Data restored successfully! The page will now refresh.');
+        window.location.reload();
+      } else {
+        alert('❌ Import failed. Please check the file format.');
+      }
+    } catch (err) {
+      alert('❌ Error reading file: ' + err.message);
+    }
+    e.target.value = '';
+  };
 
   // ===== COMPUTED INSIGHTS =====
   const avgDailySpend = useMemo(() => {
@@ -323,6 +346,45 @@ const Insights = () => {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* ===== BACKUP & RESTORE ===== */}
+      <div className="panel glass-panel" style={{ marginTop: '24px', borderTop: '4px solid var(--accent-primary)' }}>
+        <div className="panel-header">
+          <h2 className="panel-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Download size={20} color="var(--accent-primary)" />
+            Backup & Restore
+          </h2>
+        </div>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
+          Download a backup of all your data (transactions, loans, goals, wedding tasks, credit cards). You can restore from a backup file if anything goes wrong.
+        </p>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <button 
+            className="btn-primary" 
+            style={{ flex: 1, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '200px' }}
+            onClick={exportAllData}
+          >
+            <Download size={18} /> Download Backup
+          </button>
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            accept=".json" 
+            style={{ display: 'none' }} 
+            onChange={handleImport}
+          />
+          <button 
+            className="btn-secondary" 
+            style={{ flex: 1, padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', minWidth: '200px' }}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload size={18} /> Restore from Backup
+          </button>
+        </div>
+        <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '12px', fontStyle: 'italic' }}>
+          💡 Tip: Download a backup regularly to keep your data safe.
+        </p>
       </div>
     </div>
   );

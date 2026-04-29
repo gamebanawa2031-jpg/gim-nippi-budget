@@ -609,6 +609,52 @@ export const FinanceProvider = ({ children }) => {
     });
   };
 
+  // ===== BACKUP / RESTORE =====
+  const exportAllData = () => {
+    const data = {
+      transactions,
+      goals,
+      weddingTasks,
+      weddingOverallBudget,
+      loans,
+      appName: appName,
+      incomeCategories,
+      expenseCategories,
+      creditCards,
+      exportedAt: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `budget-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const importAllData = async (jsonData) => {
+    try {
+      const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      const updatePayload = {};
+      if (data.transactions) updatePayload.transactions = data.transactions;
+      if (data.goals) updatePayload.goals = data.goals;
+      if (data.weddingTasks) updatePayload.weddingTasks = data.weddingTasks;
+      if (data.weddingOverallBudget) updatePayload.weddingOverallBudget = data.weddingOverallBudget;
+      if (data.loans) updatePayload.loans = data.loans;
+      if (data.appName) updatePayload.appName = data.appName;
+      if (data.incomeCategories) updatePayload.incomeCategories = data.incomeCategories;
+      if (data.expenseCategories) updatePayload.expenseCategories = data.expenseCategories;
+      if (data.creditCards) updatePayload.creditCards = data.creditCards;
+      await updateDoc(getDocRef(), updatePayload);
+      return true;
+    } catch (error) {
+      console.error('Import failed:', error);
+      return false;
+    }
+  };
+
   // ===== DERIVED STATE (Remains same, based on cloud-synced state) =====
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((acc, t) => acc + Number(t.amount || 0), 0);
   const totalExpense = transactions.filter(t => t.type === 'expense' && t.category !== 'Saving').reduce((acc, t) => acc + Number(t.amount || 0), 0);
@@ -680,7 +726,7 @@ export const FinanceProvider = ({ children }) => {
       setWeddingBudget,
       loans, addLoan, deleteLoan, addLoanPayment, deleteLoanPayment,
       dailyExpenditure, spendingByCategory, weeklyTrend,
-      resetAllData,
+      resetAllData, exportAllData, importAllData,
       appName, setAppName,
       incomeCategories, expenseCategories, addCategory, deleteCategory,
       creditCards, addCreditCard, deleteCreditCard, addCardTransaction, deleteCardTransaction,
