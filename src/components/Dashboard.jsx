@@ -147,8 +147,8 @@ const Dashboard = () => {
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius="60%"
-                    outerRadius="80%"
+                    innerRadius={70}
+                    outerRadius={100}
                     paddingAngle={5}
                     dataKey="value"
                   >

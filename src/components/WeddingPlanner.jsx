@@ -335,7 +335,7 @@ const WeddingPlanner = () => {
             {budgetChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={budgetChartData} cx="50%" cy="50%" innerRadius="50%" outerRadius="75%" paddingAngle={3} dataKey="value">
+                  <Pie data={budgetChartData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value">
                     {budgetChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.name === 'Unallocated' ? '#334155' : CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                     ))}
