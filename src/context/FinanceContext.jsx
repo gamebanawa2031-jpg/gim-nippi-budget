@@ -226,6 +226,18 @@ export const calculateOverpaymentImpact = (principal, annualRate, tenureMonths, 
 };
 
 // ===== PROVIDER =====
+// Helper to count total data items
+const countDataItems = (data) => {
+  return (data.transactions?.length || 0) +
+    (data.goals?.length || 0) +
+    (data.weddingTasks?.length || 0) +
+    (data.loans?.length || 0) +
+    (data.creditCards?.length || 0);
+};
+
+const BACKUP_KEY = 'gim_nippi_auto_backup';
+const BACKUP_TIME_KEY = 'gim_nippi_backup_time';
+
 export const FinanceProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -240,6 +252,10 @@ export const FinanceProvider = ({ children }) => {
   const [incomeCategories, setIncomeCategories] = useState(['Salary', 'Fiverr', 'Investment', 'Other Income']);
   const [expenseCategories, setExpenseCategories] = useState(['Housing', 'Food', 'Groceries', 'Transportation', 'Utilities', 'Insurance', 'Medical', 'Saving', 'Personal', 'Debt', 'Wedding', 'Other Expense']);
   const [creditCards, setCreditCards] = useState([]);
+
+  // Auto-backup states
+  const [backupAvailable, setBackupAvailable] = useState(false);
+  const [localBackupInfo, setLocalBackupInfo] = useState(null);
 
   // Handle Auth & Cloud Sync
   useEffect(() => {
@@ -268,6 +284,57 @@ export const FinanceProvider = ({ children }) => {
           if (data.incomeCategories) setIncomeCategories(data.incomeCategories);
           if (data.expenseCategories) setExpenseCategories(data.expenseCategories);
           setCreditCards(data.creditCards || []);
+          
+          // ===== AUTO-BACKUP LOGIC =====
+          const cloudItemCount = countDataItems(data);
+          
+          if (cloudItemCount > 0) {
+            // Cloud has data — save backup to localStorage
+            try {
+              const backupPayload = {
+                transactions: data.transactions || [],
+                goals: data.goals || [],
+                weddingTasks: data.weddingTasks || [],
+                weddingOverallBudget: data.weddingOverallBudget || 2500000,
+                loans: data.loans || [],
+                appName: data.appName || 'Gim & Nippi Budget',
+                incomeCategories: data.incomeCategories || [],
+                expenseCategories: data.expenseCategories || [],
+                creditCards: data.creditCards || [],
+              };
+              localStorage.setItem(BACKUP_KEY, JSON.stringify(backupPayload));
+              localStorage.setItem(BACKUP_TIME_KEY, new Date().toISOString());
+              setBackupAvailable(false); // cloud is fine, dismiss any banner
+              console.log(`[Auto-Backup] Saved ${cloudItemCount} items to local backup`);
+            } catch (e) {
+              console.warn('[Auto-Backup] Save failed:', e);
+            }
+          } else {
+            // Cloud is empty — check if local backup has data
+            try {
+              const localBackupRaw = localStorage.getItem(BACKUP_KEY);
+              const localBackupTime = localStorage.getItem(BACKUP_TIME_KEY);
+              if (localBackupRaw) {
+                const backupData = JSON.parse(localBackupRaw);
+                const backupItemCount = countDataItems(backupData);
+                if (backupItemCount > 0) {
+                  setBackupAvailable(true);
+                  setLocalBackupInfo({
+                    timestamp: localBackupTime,
+                    transactions: backupData.transactions?.length || 0,
+                    goals: backupData.goals?.length || 0,
+                    weddingTasks: backupData.weddingTasks?.length || 0,
+                    loans: backupData.loans?.length || 0,
+                    creditCards: backupData.creditCards?.length || 0,
+                    totalItems: backupItemCount,
+                  });
+                  console.warn(`[Auto-Backup] Cloud data empty! Local backup has ${backupItemCount} items. Recovery available.`);
+                }
+              }
+            } catch (e) {
+              console.warn('[Auto-Backup] Check failed:', e);
+            }
+          }
           
           // One-time check for migration
           if (localStorage.getItem('finance_transactions') && (data.transactions || []).length === 0) {
@@ -714,6 +781,37 @@ export const FinanceProvider = ({ children }) => {
   const weddingTotalSpent = weddingTasks.reduce((acc, t) => acc + t.items.reduce((s, i) => s + Number(i.amount), 0), 0);
   const weddingTotalPaid = weddingTasks.reduce((acc, t) => acc + t.items.filter(i => i.paid).reduce((s, i) => s + Number(i.amount), 0), 0);
 
+  // ===== RESTORE FROM LOCAL BACKUP =====
+  const restoreFromLocalBackup = async () => {
+    try {
+      const localBackupRaw = localStorage.getItem(BACKUP_KEY);
+      if (!localBackupRaw) return false;
+      const backupData = JSON.parse(localBackupRaw);
+      const updatePayload = {};
+      if (backupData.transactions) updatePayload.transactions = backupData.transactions;
+      if (backupData.goals) updatePayload.goals = backupData.goals;
+      if (backupData.weddingTasks) updatePayload.weddingTasks = backupData.weddingTasks;
+      if (backupData.weddingOverallBudget) updatePayload.weddingOverallBudget = backupData.weddingOverallBudget;
+      if (backupData.loans) updatePayload.loans = backupData.loans;
+      if (backupData.appName) updatePayload.appName = backupData.appName;
+      if (backupData.incomeCategories) updatePayload.incomeCategories = backupData.incomeCategories;
+      if (backupData.expenseCategories) updatePayload.expenseCategories = backupData.expenseCategories;
+      if (backupData.creditCards) updatePayload.creditCards = backupData.creditCards;
+      await updateDoc(getDocRef(), updatePayload);
+      setBackupAvailable(false);
+      setLocalBackupInfo(null);
+      return true;
+    } catch (error) {
+      console.error('[Auto-Backup] Restore failed:', error);
+      return false;
+    }
+  };
+
+  const dismissBackupRestore = () => {
+    setBackupAvailable(false);
+    setLocalBackupInfo(null);
+  };
+
   return (
     <FinanceContext.Provider value={{
       user, loading,
@@ -732,6 +830,8 @@ export const FinanceProvider = ({ children }) => {
       creditCards, addCreditCard, deleteCreditCard, addCardTransaction, deleteCardTransaction,
       totalCardDebt: creditCards.reduce((acc, card) => acc + card.balance, 0),
       totalSavings: goals.reduce((acc, goal) => acc + goal.current, 0),
+      // Auto-backup
+      backupAvailable, localBackupInfo, restoreFromLocalBackup, dismissBackupRestore,
     }}>
       {children}
     </FinanceContext.Provider>

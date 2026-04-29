@@ -879,3 +879,158 @@ select.input-field {
     font-size: 1.5rem;
   }
 }
+
+/* ===== DATA RECOVERY BANNER ===== */
+.recovery-banner {
+  margin-bottom: 24px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  overflow: hidden;
+  animation: bannerSlideIn 0.4s ease-out;
+}
+
+@keyframes bannerSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.recovery-banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.recovery-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #F59E0B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recovery-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.recovery-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FBBF24;
+  margin: 0 0 6px 0;
+}
+
+.recovery-info p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+}
+
+.recovery-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recovery-counts span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-full);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.recovery-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.recovery-restore-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #F59E0B, #EF4444);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.recovery-restore-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.recovery-restore-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.recovery-dismiss-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recovery-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .recovery-banner-content {
+    flex-direction: column;
+    padding: 16px;
+  }
+  .recovery-icon {
+    display: none;
+  }
+  .recovery-actions {
+    width: 100%;
+  }
+  .recovery-restore-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
