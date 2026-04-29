@@ -26,7 +26,7 @@ const Dashboard = () => {
     value: expenseByCategory[key]
   }));
 
-  const COLORS = ['#6366F1', '#8B5CF6', '#EC4899', '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#22D3EE', '#F472B6'];
+  const COLORS = ['#818CF8', '#A78BFA', '#F472B6', '#FB7185', '#FBBF24', '#34D399', '#38BDF8', '#2DD4BF', '#C084FC'];
 
   const recentTransactions = transactions.slice(0, 5);
 
@@ -149,8 +149,9 @@ const Dashboard = () => {
                     cy="40%"
                     innerRadius={50}
                     outerRadius={80}
-                    paddingAngle={5}
+                    paddingAngle={2}
                     dataKey="value"
+                    stroke="none"
                   >
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
