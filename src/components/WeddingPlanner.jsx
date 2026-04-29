@@ -335,13 +335,13 @@ const WeddingPlanner = () => {
             {budgetChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={budgetChartData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value">
+                  <Pie data={budgetChartData} cx="50%" cy="40%" innerRadius={45} outerRadius={70} paddingAngle={3} dataKey="value">
                     {budgetChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.name === 'Unallocated' ? '#334155' : CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)', borderRadius: '8px' }} />
-                  <Legend />
+                  <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '0.72rem', paddingTop: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (

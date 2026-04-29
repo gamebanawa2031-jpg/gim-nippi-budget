@@ -146,9 +146,9 @@ const Dashboard = () => {
                   <Pie
                     data={chartData}
                     cx="50%"
-                    cy="50%"
-                    innerRadius={70}
-                    outerRadius={100}
+                    cy="40%"
+                    innerRadius={50}
+                    outerRadius={80}
                     paddingAngle={5}
                     dataKey="value"
                   >
@@ -160,7 +160,7 @@ const Dashboard = () => {
                     formatter={(value) => formatCurrency(value)}
                     contentStyle={{ backgroundColor: 'var(--bg-surface)', borderColor: 'var(--border-subtle)', borderRadius: '8px' }}
                   />
-                  <Legend />
+                  <Legend layout="horizontal" verticalAlign="bottom" align="center" wrapperStyle={{ fontSize: '0.75rem', paddingTop: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (

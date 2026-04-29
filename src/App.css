@@ -767,6 +767,9 @@ select.input-field {
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  .content-grid-wide {
+    grid-template-columns: 1fr;
+  }
   .loan-form-grid {
     grid-template-columns: 1fr 1fr;
   }
