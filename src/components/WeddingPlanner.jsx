@@ -4,7 +4,7 @@ import { Heart, Plus, Trash2, ChevronDown, ChevronUp, Check, X, Edit3, Settings 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const WEDDING_CATEGORIES = ['Venue', 'Catering', 'Photography', 'Attire', 'Decorations', 'Entertainment', 'Invitations', 'Transport', 'Accommodation', 'Miscellaneous'];
-const CATEGORY_COLORS = ['#EC4899', '#F59E0B', '#6366F1', '#10B981', '#06B6D4', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#64748B'];
+const CATEGORY_COLORS = ['#FF3366', '#00E676', '#2979FF', '#FFEA00', '#D500F9', '#00E5FF', '#FF6D00', '#76FF03', '#F50057', '#651FFF'];
 
 const WeddingPlanner = () => {
   const {
@@ -335,7 +335,7 @@ const WeddingPlanner = () => {
             {budgetChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={budgetChartData} cx="50%" cy="40%" innerRadius={45} outerRadius={70} paddingAngle={0} dataKey="value" stroke="none">
+                  <Pie data={budgetChartData} cx="50%" cy="40%" innerRadius={45} outerRadius={70} paddingAngle={0} dataKey="value" stroke="var(--bg-surface)" strokeWidth={1.5}>
                     {budgetChartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.name === 'Unallocated' ? '#334155' : CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
                     ))}

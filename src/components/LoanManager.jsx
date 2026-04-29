@@ -205,7 +205,7 @@ const LoanManager = () => {
                         { name: 'Principal', value: parseFloat(calcForm.loanAmount.replace(/,/g, '')) },
                         { name: 'Interest', value: calcResult.totalInterest }
                       ]}
-                      cx="50%" cy="40%" innerRadius={45} outerRadius={70} paddingAngle={0} dataKey="value" stroke="none"
+                      cx="50%" cy="40%" innerRadius={45} outerRadius={70} paddingAngle={0} dataKey="value" stroke="var(--bg-surface)" strokeWidth={1.5}
                     >
                       <Cell fill="#34d399" />
                       <Cell fill="#fb7185" />
