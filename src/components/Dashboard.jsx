@@ -151,8 +151,8 @@ const Dashboard = () => {
                     outerRadius={80}
                     paddingAngle={0}
                     dataKey="value"
-                    stroke="var(--bg-surface)"
-                    strokeWidth={1.5}
+                    stroke="#ffffff"
+                    strokeWidth={2}
                   >
                     {chartData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
