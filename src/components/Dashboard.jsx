@@ -26,7 +26,12 @@ const Dashboard = () => {
     value: expenseByCategory[key]
   }));
 
-  const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#D946EF', '#06B6D4', '#8B5CF6', '#F43F5E', '#84CC16', '#F97316', '#64748B'];
+  const COLORS = [
+    '#3B82F6', '#10B981', '#F59E0B', '#D946EF', '#06B6D4', 
+    '#8B5CF6', '#F43F5E', '#84CC16', '#F97316', '#64748B',
+    '#14B8A6', '#EAB308', '#EC4899', '#6366F1', '#22C55E',
+    '#F87171', '#A855F7', '#0EA5E9', '#D97706', '#BE123C'
+  ];
 
   const recentTransactions = transactions.slice(0, 5);
 
