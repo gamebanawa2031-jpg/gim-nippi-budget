@@ -4,7 +4,7 @@ import { Heart, Plus, Trash2, ChevronDown, ChevronUp, Check, X, Edit3, Settings 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const WEDDING_CATEGORIES = ['Venue', 'Catering', 'Photography', 'Attire', 'Decorations', 'Entertainment', 'Invitations', 'Transport', 'Accommodation', 'Miscellaneous'];
-const CATEGORY_COLORS = ['#FF3366', '#00E676', '#2979FF', '#FFEA00', '#D500F9', '#00E5FF', '#FF6D00', '#76FF03', '#F50057', '#651FFF'];
+const CATEGORY_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#D946EF', '#06B6D4', '#8B5CF6', '#F43F5E', '#84CC16', '#F97316', '#64748B'];
 
 const WeddingPlanner = () => {
   const {
