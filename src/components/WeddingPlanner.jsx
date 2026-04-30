@@ -454,51 +454,51 @@ const WeddingPlanner = () => {
           <div className="panel glass-panel">
             <h2 className="panel-title" style={{ marginBottom: '16px' }}>Guest List</h2>
             <div className="table-responsive">
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-                    <th style={{ padding: '12px 8px', fontWeight: 500 }}>Name</th>
-                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center', width: '100px' }}>Count</th>
-                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right', width: '150px' }}>Expected Funds</th>
-                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center', width: '150px' }}>Status</th>
-                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right', width: '100px' }}>Actions</th>
+                    <th style={{ padding: '10px 8px', fontWeight: 500 }}>Name</th>
+                    <th style={{ padding: '10px 8px', fontWeight: 500, textAlign: 'center', width: '60px' }}>Count</th>
+                    <th style={{ padding: '10px 8px', fontWeight: 500, textAlign: 'right', width: '110px' }}>Expected Funds</th>
+                    <th style={{ padding: '10px 8px', fontWeight: 500, textAlign: 'center', width: '130px' }}>Status</th>
+                    <th style={{ padding: '10px 8px', fontWeight: 500, textAlign: 'right', width: '80px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {/* Add New Row */}
                   <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
-                    <td style={{ padding: '8px' }}>
+                    <td style={{ padding: '6px' }}>
                       <input type="text" className="input-field" placeholder="Guest name..." 
-                        style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                        style={{ padding: '6px 10px', fontSize: '0.85rem' }}
                         value={newInvitee.name} onChange={(e) => setNewInvitee({...newInvitee, name: e.target.value})} 
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee(e)}
                       />
                     </td>
-                    <td style={{ padding: '8px' }}>
+                    <td style={{ padding: '6px' }}>
                       <input type="number" className="input-field" min="1" step="1"
-                        style={{ padding: '8px 12px', fontSize: '0.9rem', textAlign: 'center' }}
+                        style={{ padding: '6px 8px', fontSize: '0.85rem', textAlign: 'center' }}
                         value={newInvitee.count} onChange={handleCountChange} 
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee(e)}
                       />
                     </td>
-                    <td style={{ padding: '8px' }}>
+                    <td style={{ padding: '6px' }}>
                       <input type="number" className="input-field" min="0" step="1"
-                        style={{ padding: '8px 12px', fontSize: '0.9rem', textAlign: 'right' }}
+                        style={{ padding: '6px 8px', fontSize: '0.85rem', textAlign: 'right' }}
                         value={newInvitee.expectedFunds} onChange={(e) => setNewInvitee({...newInvitee, expectedFunds: e.target.value})} 
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee(e)}
                       />
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                    <td style={{ padding: '6px', textAlign: 'center' }}>
                       <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-muted)' }}>Pending</span>
                     </td>
-                    <td style={{ padding: '8px', textAlign: 'right' }}>
+                    <td style={{ padding: '6px', textAlign: 'right' }}>
                       <button 
                         onClick={handleAddInvitee}
                         className="btn-wedding"
-                        style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                        style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                         disabled={!newInvitee.name}
                       >
-                        <Plus size={16} /> Add
+                        <Plus size={14} /> Add
                       </button>
                     </td>
                   </tr>
@@ -506,22 +506,22 @@ const WeddingPlanner = () => {
                   {/* Existing Rows */}
                   {weddingInvitees.length === 0 && (
                     <tr>
-                      <td colSpan="5" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '24px 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                         No guests added yet. Add someone using the row above!
                       </td>
                     </tr>
                   )}
                   {weddingInvitees.map((inv) => (
                     <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '12px 8px', fontWeight: 500 }}>{inv.name}</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                        <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)' }}>{inv.count}</span>
+                      <td style={{ padding: '10px 8px', fontWeight: 500 }}>{inv.name}</td>
+                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                        <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', fontSize: '0.8rem', padding: '2px 8px' }}>{inv.count}</span>
                       </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
-                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                      <td style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
+                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
                         <select 
                           className="input-field" 
-                          style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
+                          style={{ padding: '4px 8px', fontSize: '0.8rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
                           value={inv.status}
                           onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
                         >
@@ -530,7 +530,7 @@ const WeddingPlanner = () => {
                           <option value="confirmed">Confirmed</option>
                         </select>
                       </td>
-                      <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                      <td style={{ padding: '10px 8px', textAlign: 'right' }}>
                         <button 
                           onClick={() => deleteWeddingInvitee(inv.id)}
                           style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
