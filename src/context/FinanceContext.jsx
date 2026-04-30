@@ -231,6 +231,7 @@ const countDataItems = (data) => {
   return (data.transactions?.length || 0) +
     (data.goals?.length || 0) +
     (data.weddingTasks?.length || 0) +
+    (data.weddingInvitees?.length || 0) +
     (data.loans?.length || 0) +
     (data.creditCards?.length || 0);
 };
@@ -246,6 +247,7 @@ export const FinanceProvider = ({ children }) => {
   const [transactions, setTransactions] = useState([]);
   const [goals, setGoals] = useState([]);
   const [weddingTasks, setWeddingTasks] = useState([]);
+  const [weddingInvitees, setWeddingInvitees] = useState([]);
   const [weddingOverallBudget, setWeddingOverallBudget] = useState(2500000);
   const [loans, setLoans] = useState([]);
   const [appName, setAppNameState] = useState('Gim & Nippi Budget');
@@ -278,6 +280,7 @@ export const FinanceProvider = ({ children }) => {
           setTransactions(data.transactions || []);
           setGoals(data.goals || []);
           setWeddingTasks(data.weddingTasks || []);
+          setWeddingInvitees(data.weddingInvitees || []);
           setWeddingOverallBudget(data.weddingOverallBudget || 2500000);
           setLoans(data.loans || []);
           setAppNameState(data.appName || 'Gim & Nippi Budget');
@@ -295,6 +298,7 @@ export const FinanceProvider = ({ children }) => {
                 transactions: data.transactions || [],
                 goals: data.goals || [],
                 weddingTasks: data.weddingTasks || [],
+                weddingInvitees: data.weddingInvitees || [],
                 weddingOverallBudget: data.weddingOverallBudget || 2500000,
                 loans: data.loans || [],
                 appName: data.appName || 'Gim & Nippi Budget',
@@ -324,6 +328,7 @@ export const FinanceProvider = ({ children }) => {
                     transactions: backupData.transactions?.length || 0,
                     goals: backupData.goals?.length || 0,
                     weddingTasks: backupData.weddingTasks?.length || 0,
+                    weddingInvitees: backupData.weddingInvitees?.length || 0,
                     loans: backupData.loans?.length || 0,
                     creditCards: backupData.creditCards?.length || 0,
                     totalItems: backupItemCount,
@@ -358,6 +363,7 @@ export const FinanceProvider = ({ children }) => {
       transactions: JSON.parse(localStorage.getItem('finance_transactions') || '[]'),
       goals: JSON.parse(localStorage.getItem('finance_goals') || '[]'),
       weddingTasks: JSON.parse(localStorage.getItem('finance_wedding_tasks') || '[]'),
+      weddingInvitees: JSON.parse(localStorage.getItem('finance_wedding_invitees') || '[]'),
       weddingOverallBudget: Number(localStorage.getItem('finance_wedding_budget') || '2500000'),
       loans: JSON.parse(localStorage.getItem('finance_loans') || '[]'),
       appName: localStorage.getItem('finance_app_name') || 'Gim & Nippi Budget'
@@ -370,12 +376,13 @@ export const FinanceProvider = ({ children }) => {
       localStorage.removeItem('finance_transactions');
       localStorage.removeItem('finance_goals');
       localStorage.removeItem('finance_wedding_tasks');
+      localStorage.removeItem('finance_wedding_invitees');
       localStorage.removeItem('finance_wedding_budget');
       localStorage.removeItem('finance_loans');
       localStorage.removeItem('finance_app_name');
     } else {
       // Initialize empty if no local data
-      await setDoc(docRef, { transactions: [], goals: [], weddingTasks: [], loans: [] }, { merge: true });
+      await setDoc(docRef, { transactions: [], goals: [], weddingTasks: [], weddingInvitees: [], loans: [] }, { merge: true });
     }
   };
 
@@ -495,6 +502,28 @@ export const FinanceProvider = ({ children }) => {
 
   const setWeddingBudget = async (amount) => {
     await updateDoc(getDocRef(), { weddingOverallBudget: amount });
+  };
+
+  const addWeddingInvitee = async (invitee) => {
+    const newInvitee = { 
+      ...invitee, 
+      id: Date.now().toString(),
+      count: Number(invitee.count) || 1,
+      expectedFunds: Number(invitee.expectedFunds) || (Number(invitee.count) || 1) * 5000,
+      status: invitee.status || 'pending'
+    };
+    const updated = [...weddingInvitees, newInvitee];
+    await updateDoc(getDocRef(), { weddingInvitees: updated });
+  };
+
+  const updateWeddingInvitee = async (id, updates) => {
+    const updated = weddingInvitees.map(inv => inv.id === id ? { ...inv, ...updates } : inv);
+    await updateDoc(getDocRef(), { weddingInvitees: updated });
+  };
+
+  const deleteWeddingInvitee = async (id) => {
+    const updated = weddingInvitees.filter(inv => inv.id !== id);
+    await updateDoc(getDocRef(), { weddingInvitees: updated });
   };
 
   const addLoan = async (loan) => {
@@ -670,6 +699,7 @@ export const FinanceProvider = ({ children }) => {
       transactions: [],
       goals: [],
       weddingTasks: [],
+      weddingInvitees: [],
       weddingOverallBudget: 2500000,
       loans: [],
       appName: 'Gim & Nippi Budget'
@@ -682,6 +712,7 @@ export const FinanceProvider = ({ children }) => {
       transactions,
       goals,
       weddingTasks,
+      weddingInvitees,
       weddingOverallBudget,
       loans,
       appName: appName,
@@ -708,6 +739,7 @@ export const FinanceProvider = ({ children }) => {
       if (data.transactions) updatePayload.transactions = data.transactions;
       if (data.goals) updatePayload.goals = data.goals;
       if (data.weddingTasks) updatePayload.weddingTasks = data.weddingTasks;
+      if (data.weddingInvitees) updatePayload.weddingInvitees = data.weddingInvitees;
       if (data.weddingOverallBudget) updatePayload.weddingOverallBudget = data.weddingOverallBudget;
       if (data.loans) updatePayload.loans = data.loans;
       if (data.appName) updatePayload.appName = data.appName;
@@ -791,6 +823,7 @@ export const FinanceProvider = ({ children }) => {
       if (backupData.transactions) updatePayload.transactions = backupData.transactions;
       if (backupData.goals) updatePayload.goals = backupData.goals;
       if (backupData.weddingTasks) updatePayload.weddingTasks = backupData.weddingTasks;
+      if (backupData.weddingInvitees) updatePayload.weddingInvitees = backupData.weddingInvitees;
       if (backupData.weddingOverallBudget) updatePayload.weddingOverallBudget = backupData.weddingOverallBudget;
       if (backupData.loans) updatePayload.loans = backupData.loans;
       if (backupData.appName) updatePayload.appName = backupData.appName;
@@ -822,6 +855,7 @@ export const FinanceProvider = ({ children }) => {
       addWeddingExpense, deleteWeddingExpense, toggleWeddingExpensePaid,
       weddingTotalBudget, weddingTotalAllocated, weddingTotalSpent, weddingTotalPaid,
       setWeddingBudget,
+      weddingInvitees, addWeddingInvitee, updateWeddingInvitee, deleteWeddingInvitee,
       loans, addLoan, deleteLoan, addLoanPayment, deleteLoanPayment,
       dailyExpenditure, spendingByCategory, weeklyTrend,
       resetAllData, exportAllData, importAllData,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFinance, formatCurrency, getDaysUntilWedding, WEDDING_DATE } from '../context/FinanceContext';
-import { Heart, Plus, Trash2, ChevronDown, ChevronUp, Check, X, Edit3, Settings } from 'lucide-react';
+import { Heart, Plus, Trash2, ChevronDown, ChevronUp, Check, X, Edit3, Settings, Users, PhoneCall, Gift } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
 const WEDDING_CATEGORIES = ['Venue', 'Catering', 'Photography', 'Attire', 'Decorations', 'Entertainment', 'Invitations', 'Transport', 'Accommodation', 'Miscellaneous'];
@@ -16,7 +16,8 @@ const WeddingPlanner = () => {
     weddingTasks, addWeddingTask, deleteWeddingTask,
     addWeddingExpense, deleteWeddingExpense, toggleWeddingExpensePaid,
     weddingTotalBudget, weddingTotalAllocated, weddingTotalSpent, weddingTotalPaid,
-    setWeddingBudget
+    setWeddingBudget,
+    weddingInvitees, addWeddingInvitee, updateWeddingInvitee, deleteWeddingInvitee
   } = useFinance();
 
   const [expandedTask, setExpandedTask] = useState(null);
@@ -24,6 +25,10 @@ const WeddingPlanner = () => {
   const [showAddExpense, setShowAddExpense] = useState(null);
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
+  
+  const [activeTab, setActiveTab] = useState('tasks');
+  const [showAddInvitee, setShowAddInvitee] = useState(false);
+  const [newInvitee, setNewInvitee] = useState({ name: '', count: 1, expectedFunds: 5000 });
 
   // Add task form
   const [newTask, setNewTask] = useState({ taskName: '', category: 'Venue', budgetAllocated: '' });
@@ -45,6 +50,12 @@ const WeddingPlanner = () => {
   if (unallocated > 0) {
     budgetChartData.push({ name: 'Unallocated', value: unallocated });
   }
+
+  // Invitee Calculations
+  const totalInvitees = weddingInvitees?.reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
+  const totalCalled = weddingInvitees?.filter(inv => inv.status === 'called' || inv.status === 'confirmed').reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
+  const totalConfirmed = weddingInvitees?.filter(inv => inv.status === 'confirmed').reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
+  const totalExpectedFunds = weddingInvitees?.reduce((sum, inv) => sum + Number(inv.expectedFunds || 0), 0) || 0;
 
   const handleAddTask = (e) => {
     e.preventDefault();
@@ -75,6 +86,23 @@ const WeddingPlanner = () => {
     setEditingBudget(true);
   };
 
+  const handleAddInvitee = (e) => {
+    e.preventDefault();
+    if (!newInvitee.name) return;
+    addWeddingInvitee({ 
+      name: newInvitee.name, 
+      count: Number(newInvitee.count), 
+      expectedFunds: Number(newInvitee.expectedFunds)
+    });
+    setNewInvitee({ name: '', count: 1, expectedFunds: 5000 });
+    setShowAddInvitee(false);
+  };
+
+  const handleCountChange = (e) => {
+    const count = parseInt(e.target.value) || 1;
+    setNewInvitee({ ...newInvitee, count, expectedFunds: count * 5000 });
+  };
+
   return (
     <div>
       {/* Header */}
@@ -86,16 +114,42 @@ const WeddingPlanner = () => {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn-secondary" onClick={startEditBudget} style={{ color: 'var(--wedding-primary)', borderColor: 'var(--wedding-glow)' }}>
-            <Settings size={18} /> Set Budget
-          </button>
-          <button className="btn-wedding" onClick={() => setShowAddTask(true)}>
-            <Plus size={20} />
-            Add Task
-          </button>
+          {activeTab === 'tasks' && (
+            <>
+              <button className="btn-secondary" onClick={startEditBudget} style={{ color: 'var(--wedding-primary)', borderColor: 'var(--wedding-glow)' }}>
+                <Settings size={18} /> Set Budget
+              </button>
+              <button className="btn-wedding" onClick={() => setShowAddTask(true)}>
+                <Plus size={20} /> Add Task
+              </button>
+            </>
+          )}
+          {activeTab === 'invitees' && (
+            <button className="btn-wedding" onClick={() => setShowAddInvitee(true)}>
+              <Plus size={20} /> Add Invitee
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid var(--border-subtle)', marginBottom: '24px' }}>
+        <button 
+          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'tasks' ? '3px solid var(--wedding-primary)' : '3px solid transparent', color: activeTab === 'tasks' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: activeTab === 'tasks' ? 600 : 400, cursor: 'pointer', fontSize: '1rem', transition: 'all 0.2s' }}
+          onClick={() => setActiveTab('tasks')}
+        >
+          Budget & Tasks
+        </button>
+        <button 
+          style={{ padding: '12px 24px', background: 'none', border: 'none', borderBottom: activeTab === 'invitees' ? '3px solid var(--wedding-primary)' : '3px solid transparent', color: activeTab === 'invitees' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: activeTab === 'invitees' ? 600 : 400, cursor: 'pointer', fontSize: '1rem', transition: 'all 0.2s' }}
+          onClick={() => setActiveTab('invitees')}
+        >
+          Guest List
+        </button>
+      </div>
+
+      {activeTab === 'tasks' && (
+        <>
       {/* Budget Editor Inline */}
       {editingBudget && (
         <div className="panel glass-panel" style={{ marginBottom: '24px', padding: '20px', borderTop: '4px solid var(--wedding-primary)' }}>
@@ -357,6 +411,100 @@ const WeddingPlanner = () => {
           </div>
         </div>
       </div>
+        </>
+      )}
+
+      {activeTab === 'invitees' && (
+        <>
+          {/* Invitee Summary Cards */}
+          <div className="dashboard-grid" style={{ marginBottom: '24px' }}>
+            <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--info)' }}>
+              <div className="summary-card-header">
+                <span>Total Invitees</span>
+                <Users size={18} color="var(--info)" />
+              </div>
+              <div className="summary-card-value" style={{ fontSize: '1.5rem' }}>{totalInvitees}</div>
+            </div>
+            <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--warning)' }}>
+              <div className="summary-card-header">
+                <span>Already Called</span>
+                <PhoneCall size={18} color="var(--warning)" />
+              </div>
+              <div className="summary-card-value" style={{ fontSize: '1.5rem' }}>{totalCalled} <span style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>/ {totalInvitees}</span></div>
+            </div>
+            <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--success)' }}>
+              <div className="summary-card-header">
+                <span>Confirmed</span>
+                <Check size={18} color="var(--success)" />
+              </div>
+              <div className="summary-card-value" style={{ fontSize: '1.5rem', color: 'var(--success)' }}>{totalConfirmed} <span style={{fontSize: '0.9rem', color: 'var(--text-muted)'}}>/ {totalInvitees}</span></div>
+            </div>
+            <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--wedding-primary)' }}>
+              <div className="summary-card-header">
+                <span>Expected Funds</span>
+                <Gift size={18} color="var(--wedding-primary)" />
+              </div>
+              <div className="summary-card-value" style={{ fontSize: '1.5rem', color: 'var(--wedding-primary)' }}>{formatCurrency(totalExpectedFunds)}</div>
+            </div>
+          </div>
+
+          {/* Invitee List */}
+          <div className="panel glass-panel">
+            <h2 className="panel-title" style={{ marginBottom: '16px' }}>Guest List</h2>
+            {weddingInvitees && weddingInvitees.length > 0 ? (
+              <div className="table-responsive">
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
+                      <th style={{ padding: '12px 8px', fontWeight: 500 }}>Name</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center' }}>Count</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right' }}>Expected Funds</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center' }}>Status</th>
+                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {weddingInvitees.map((inv) => (
+                      <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                        <td style={{ padding: '12px 8px', fontWeight: 500 }}>{inv.name}</td>
+                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                          <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)' }}>{inv.count}</span>
+                        </td>
+                        <td style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
+                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                          <select 
+                            className="input-field" 
+                            style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
+                            value={inv.status}
+                            onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="called">Already Called</option>
+                            <option value="confirmed">Confirmed</option>
+                          </select>
+                        </td>
+                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                          <button 
+                            onClick={() => deleteWeddingInvitee(inv.id)}
+                            style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                            title="Remove Invitee"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px', fontSize: '0.9rem' }}>
+                No guests added yet. Click "Add Invitee" to get started!
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* Add Task Modal */}
       {showAddTask && (
@@ -395,6 +543,46 @@ const WeddingPlanner = () => {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '24px' }}>
                 <button type="button" className="btn-secondary" onClick={() => setShowAddTask(false)}>Cancel</button>
                 <button type="submit" className="btn-wedding">Add Task</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Invitee Modal */}
+      {showAddInvitee && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <div className="header" style={{ marginBottom: '24px' }}>
+              <h2 className="panel-title">Add Guest</h2>
+              <button onClick={() => setShowAddInvitee(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
+                <X size={24} />
+              </button>
+            </div>
+            <form onSubmit={handleAddInvitee}>
+              <div className="form-group">
+                <label>Guest / Family Name</label>
+                <input type="text" className="input-field" placeholder="e.g., The Smith Family" 
+                  value={newInvitee.name} onChange={(e) => setNewInvitee({...newInvitee, name: e.target.value})} required autoFocus />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Count (Number of people)</label>
+                  <input type="number" className="input-field" min="1" step="1"
+                    value={newInvitee.count} onChange={handleCountChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Expected Funds (Rs.)</label>
+                  <input type="number" className="input-field" min="0" step="1"
+                    value={newInvitee.expectedFunds} onChange={(e) => setNewInvitee({...newInvitee, expectedFunds: e.target.value})} required />
+                </div>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                Default expected fund is set to 5000 Rs per head.
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '24px' }}>
+                <button type="button" className="btn-secondary" onClick={() => setShowAddInvitee(false)}>Cancel</button>
+                <button type="submit" className="btn-wedding">Add Guest</button>
               </div>
             </form>
           </div>
