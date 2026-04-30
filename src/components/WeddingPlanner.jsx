@@ -581,7 +581,11 @@ const WeddingPlanner = () => {
                                 <Edit3 size={16} />
                               </button>
                               <button 
-                                onClick={() => deleteWeddingInvitee(inv.id)}
+                                onClick={() => {
+                                  if (window.confirm(`Are you sure you want to remove ${inv.name} from the guest list?`)) {
+                                    deleteWeddingInvitee(inv.id);
+                                  }
+                                }}
                                 style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
                                 title="Remove Invitee"
                               >
