@@ -54,7 +54,7 @@ const WeddingPlanner = () => {
   const totalInvitees = weddingInvitees?.reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
   const totalCalled = weddingInvitees?.filter(inv => inv.status === 'called' || inv.status === 'confirmed').reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
   const totalConfirmed = weddingInvitees?.filter(inv => inv.status === 'confirmed').reduce((sum, inv) => sum + Number(inv.count || 1), 0) || 0;
-  const totalExpectedFunds = weddingInvitees?.reduce((sum, inv) => sum + Number(inv.expectedFunds || 0), 0) || 0;
+  const totalExpectedFunds = weddingInvitees?.filter(inv => inv.status === 'confirmed').reduce((sum, inv) => sum + Number(inv.expectedFunds || 0), 0) || 0;
 
   const handleAddTask = (e) => {
     e.preventDefault();
@@ -443,7 +443,7 @@ const WeddingPlanner = () => {
             </div>
             <div className="summary-card glass-panel" style={{ borderTop: '4px solid var(--wedding-primary)' }}>
               <div className="summary-card-header">
-                <span>Expected Funds</span>
+                <span>Confirmed Funds</span>
                 <Gift size={18} color="var(--wedding-primary)" />
               </div>
               <div className="summary-card-value" style={{ fontSize: '1.5rem', color: 'var(--wedding-primary)' }}>{formatCurrency(totalExpectedFunds)}</div>
