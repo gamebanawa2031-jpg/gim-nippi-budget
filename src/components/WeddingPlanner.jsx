@@ -28,6 +28,8 @@ const WeddingPlanner = () => {
   
   const [activeTab, setActiveTab] = useState('tasks');
   const [newInvitee, setNewInvitee] = useState({ name: '', count: 1, expectedFunds: 5000 });
+  const [editingInviteeId, setEditingInviteeId] = useState(null);
+  const [editInviteeData, setEditInviteeData] = useState({ name: '', count: 1, expectedFunds: 0 });
 
   // Add task form
   const [newTask, setNewTask] = useState({ taskName: '', category: 'Venue', budgetAllocated: '' });
@@ -511,36 +513,87 @@ const WeddingPlanner = () => {
                       </td>
                     </tr>
                   )}
-                  {weddingInvitees.map((inv) => (
+                  {weddingInvitees.map((inv) => {
+                    const isEditing = editingInviteeId === inv.id;
+                    return (
                     <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                      <td style={{ padding: '10px 8px', fontWeight: 500 }}>{inv.name}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                        <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', fontSize: '0.8rem', padding: '2px 8px' }}>{inv.count}</span>
-                      </td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
-                      <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                        <select 
-                          className="input-field" 
-                          style={{ padding: '4px 8px', fontSize: '0.8rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
-                          value={inv.status}
-                          onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
-                        >
-                          <option value="pending">Pending</option>
-                          <option value="called">Already Called</option>
-                          <option value="confirmed">Confirmed</option>
-                        </select>
-                      </td>
-                      <td style={{ padding: '10px 8px', textAlign: 'right' }}>
-                        <button 
-                          onClick={() => deleteWeddingInvitee(inv.id)}
-                          style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
-                          title="Remove Invitee"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </td>
+                      {isEditing ? (
+                        <>
+                          <td style={{ padding: '6px' }}>
+                            <input type="text" className="input-field" style={{ padding: '6px 8px', fontSize: '0.85rem' }} value={editInviteeData.name} onChange={(e) => setEditInviteeData({...editInviteeData, name: e.target.value})} autoFocus />
+                          </td>
+                          <td style={{ padding: '6px' }}>
+                            <input type="number" className="input-field" style={{ padding: '6px 8px', fontSize: '0.85rem', textAlign: 'center' }} value={editInviteeData.count} onChange={(e) => setEditInviteeData({...editInviteeData, count: e.target.value})} />
+                          </td>
+                          <td style={{ padding: '6px' }}>
+                            <input type="number" className="input-field" style={{ padding: '6px 8px', fontSize: '0.85rem', textAlign: 'right' }} value={editInviteeData.expectedFunds} onChange={(e) => setEditInviteeData({...editInviteeData, expectedFunds: e.target.value})} />
+                          </td>
+                          <td style={{ padding: '6px', textAlign: 'center' }}>
+                            <span className="badge" style={{ background: 'var(--bg-surface)', color: 'var(--text-muted)' }}>Editing</span>
+                          </td>
+                          <td style={{ padding: '6px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+                              <button onClick={() => {
+                                updateWeddingInvitee(inv.id, {
+                                  name: editInviteeData.name,
+                                  count: Number(editInviteeData.count) || 1,
+                                  expectedFunds: editInviteeData.expectedFunds !== '' ? Number(editInviteeData.expectedFunds) : (Number(editInviteeData.count) || 1) * 5000
+                                });
+                                setEditingInviteeId(null);
+                              }} style={{ background: 'none', border: 'none', color: 'var(--success)', cursor: 'pointer', padding: '4px' }}>
+                                <Check size={16} />
+                              </button>
+                              <button onClick={() => setEditingInviteeId(null)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+                                <X size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td style={{ padding: '10px 8px', fontWeight: 500 }}>{inv.name}</td>
+                          <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                            <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)', fontSize: '0.8rem', padding: '2px 8px' }}>{inv.count}</span>
+                          </td>
+                          <td style={{ padding: '10px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
+                          <td style={{ padding: '10px 8px', textAlign: 'center' }}>
+                            <select 
+                              className="input-field" 
+                              style={{ padding: '4px 8px', fontSize: '0.8rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
+                              value={inv.status}
+                              onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="called">Already Called</option>
+                              <option value="confirmed">Confirmed</option>
+                            </select>
+                          </td>
+                          <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
+                              <button 
+                                onClick={() => {
+                                  setEditingInviteeId(inv.id);
+                                  setEditInviteeData({ name: inv.name, count: inv.count, expectedFunds: inv.expectedFunds });
+                                }}
+                                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '4px' }}
+                                title="Edit Invitee"
+                              >
+                                <Edit3 size={16} />
+                              </button>
+                              <button 
+                                onClick={() => deleteWeddingInvitee(inv.id)}
+                                style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                                title="Remove Invitee"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
+                          </td>
+                        </>
+                      )}
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
