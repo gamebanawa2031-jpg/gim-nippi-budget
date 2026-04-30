@@ -88,17 +88,26 @@ const WeddingPlanner = () => {
   const handleAddInvitee = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!newInvitee.name) return;
+    
+    const finalCount = Number(newInvitee.count) || 1;
+    const finalFunds = newInvitee.expectedFunds !== '' ? Number(newInvitee.expectedFunds) : finalCount * 5000;
+    
     addWeddingInvitee({ 
       name: newInvitee.name, 
-      count: Number(newInvitee.count), 
-      expectedFunds: Number(newInvitee.expectedFunds)
+      count: finalCount, 
+      expectedFunds: finalFunds
     });
     setNewInvitee({ name: '', count: 1, expectedFunds: 5000 });
   };
 
   const handleCountChange = (e) => {
-    const count = parseInt(e.target.value) || 1;
-    setNewInvitee({ ...newInvitee, count, expectedFunds: count * 5000 });
+    const val = e.target.value;
+    if (val === '') {
+      setNewInvitee({ ...newInvitee, count: '', expectedFunds: '' });
+    } else {
+      const count = parseInt(val, 10);
+      setNewInvitee({ ...newInvitee, count, expectedFunds: count * 5000 });
+    }
   };
 
   return (
