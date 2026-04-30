@@ -27,7 +27,6 @@ const WeddingPlanner = () => {
   const [budgetInput, setBudgetInput] = useState('');
   
   const [activeTab, setActiveTab] = useState('tasks');
-  const [showAddInvitee, setShowAddInvitee] = useState(false);
   const [newInvitee, setNewInvitee] = useState({ name: '', count: 1, expectedFunds: 5000 });
 
   // Add task form
@@ -87,7 +86,7 @@ const WeddingPlanner = () => {
   };
 
   const handleAddInvitee = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (!newInvitee.name) return;
     addWeddingInvitee({ 
       name: newInvitee.name, 
@@ -95,7 +94,6 @@ const WeddingPlanner = () => {
       expectedFunds: Number(newInvitee.expectedFunds)
     });
     setNewInvitee({ name: '', count: 1, expectedFunds: 5000 });
-    setShowAddInvitee(false);
   };
 
   const handleCountChange = (e) => {
@@ -123,11 +121,6 @@ const WeddingPlanner = () => {
                 <Plus size={20} /> Add Task
               </button>
             </>
-          )}
-          {activeTab === 'invitees' && (
-            <button className="btn-wedding" onClick={() => setShowAddInvitee(true)}>
-              <Plus size={20} /> Add Invitee
-            </button>
           )}
         </div>
       </div>
@@ -451,57 +444,97 @@ const WeddingPlanner = () => {
           {/* Invitee List */}
           <div className="panel glass-panel">
             <h2 className="panel-title" style={{ marginBottom: '16px' }}>Guest List</h2>
-            {weddingInvitees && weddingInvitees.length > 0 ? (
-              <div className="table-responsive">
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
-                      <th style={{ padding: '12px 8px', fontWeight: 500 }}>Name</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center' }}>Count</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right' }}>Expected Funds</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center' }}>Status</th>
-                      <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right' }}>Actions</th>
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)' }}>
+                    <th style={{ padding: '12px 8px', fontWeight: 500 }}>Name</th>
+                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center', width: '100px' }}>Count</th>
+                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right', width: '150px' }}>Expected Funds</th>
+                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'center', width: '150px' }}>Status</th>
+                    <th style={{ padding: '12px 8px', fontWeight: 500, textAlign: 'right', width: '100px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Add New Row */}
+                  <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}>
+                    <td style={{ padding: '8px' }}>
+                      <input type="text" className="input-field" placeholder="Guest name..." 
+                        style={{ padding: '8px 12px', fontSize: '0.9rem' }}
+                        value={newInvitee.name} onChange={(e) => setNewInvitee({...newInvitee, name: e.target.value})} 
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                      />
+                    </td>
+                    <td style={{ padding: '8px' }}>
+                      <input type="number" className="input-field" min="1" step="1"
+                        style={{ padding: '8px 12px', fontSize: '0.9rem', textAlign: 'center' }}
+                        value={newInvitee.count} onChange={handleCountChange} 
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                      />
+                    </td>
+                    <td style={{ padding: '8px' }}>
+                      <input type="number" className="input-field" min="0" step="1"
+                        style={{ padding: '8px 12px', fontSize: '0.9rem', textAlign: 'right' }}
+                        value={newInvitee.expectedFunds} onChange={(e) => setNewInvitee({...newInvitee, expectedFunds: e.target.value})} 
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddInvitee()}
+                      />
+                    </td>
+                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                      <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-muted)' }}>Pending</span>
+                    </td>
+                    <td style={{ padding: '8px', textAlign: 'right' }}>
+                      <button 
+                        onClick={handleAddInvitee}
+                        className="btn-wedding"
+                        style={{ padding: '8px 16px', fontSize: '0.85rem' }}
+                        disabled={!newInvitee.name}
+                      >
+                        <Plus size={16} /> Add
+                      </button>
+                    </td>
+                  </tr>
+
+                  {/* Existing Rows */}
+                  {weddingInvitees.length === 0 && (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+                        No guests added yet. Add someone using the row above!
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {weddingInvitees.map((inv) => (
-                      <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                        <td style={{ padding: '12px 8px', fontWeight: 500 }}>{inv.name}</td>
-                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                          <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)' }}>{inv.count}</span>
-                        </td>
-                        <td style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
-                        <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-                          <select 
-                            className="input-field" 
-                            style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
-                            value={inv.status}
-                            onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="called">Already Called</option>
-                            <option value="confirmed">Confirmed</option>
-                          </select>
-                        </td>
-                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                          <button 
-                            onClick={() => deleteWeddingInvitee(inv.id)}
-                            style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
-                            title="Remove Invitee"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px', fontSize: '0.9rem' }}>
-                No guests added yet. Click "Add Invitee" to get started!
-              </div>
-            )}
+                  )}
+                  {weddingInvitees.map((inv) => (
+                    <tr key={inv.id} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <td style={{ padding: '12px 8px', fontWeight: 500 }}>{inv.name}</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <span className="badge" style={{ background: 'var(--bg-hover)', color: 'var(--text-primary)' }}>{inv.count}</span>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'right', color: 'var(--wedding-primary)' }}>{formatCurrency(inv.expectedFunds)}</td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <select 
+                          className="input-field" 
+                          style={{ padding: '6px 12px', fontSize: '0.85rem', width: 'auto', display: 'inline-block', backgroundColor: inv.status === 'confirmed' ? 'rgba(34, 197, 94, 0.1)' : inv.status === 'called' ? 'rgba(234, 179, 8, 0.1)' : 'var(--bg-surface)' }}
+                          value={inv.status}
+                          onChange={(e) => updateWeddingInvitee(inv.id, { status: e.target.value })}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="called">Already Called</option>
+                          <option value="confirmed">Confirmed</option>
+                        </select>
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                        <button 
+                          onClick={() => deleteWeddingInvitee(inv.id)}
+                          style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', padding: '4px' }}
+                          title="Remove Invitee"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}
@@ -549,45 +582,7 @@ const WeddingPlanner = () => {
         </div>
       )}
 
-      {/* Add Invitee Modal */}
-      {showAddInvitee && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel">
-            <div className="header" style={{ marginBottom: '24px' }}>
-              <h2 className="panel-title">Add Guest</h2>
-              <button onClick={() => setShowAddInvitee(false)} style={{ background: 'none', border: 'none', color: 'var(--text-secondary)' }}>
-                <X size={24} />
-              </button>
-            </div>
-            <form onSubmit={handleAddInvitee}>
-              <div className="form-group">
-                <label>Guest / Family Name</label>
-                <input type="text" className="input-field" placeholder="e.g., The Smith Family" 
-                  value={newInvitee.name} onChange={(e) => setNewInvitee({...newInvitee, name: e.target.value})} required autoFocus />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Count (Number of people)</label>
-                  <input type="number" className="input-field" min="1" step="1"
-                    value={newInvitee.count} onChange={handleCountChange} required />
-                </div>
-                <div className="form-group">
-                  <label>Expected Funds (Rs.)</label>
-                  <input type="number" className="input-field" min="0" step="1"
-                    value={newInvitee.expectedFunds} onChange={(e) => setNewInvitee({...newInvitee, expectedFunds: e.target.value})} required />
-                </div>
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                Default expected fund is set to 5000 Rs per head.
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '24px' }}>
-                <button type="button" className="btn-secondary" onClick={() => setShowAddInvitee(false)}>Cancel</button>
-                <button type="submit" className="btn-wedding">Add Guest</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };
