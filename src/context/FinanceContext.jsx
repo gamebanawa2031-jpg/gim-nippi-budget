@@ -468,6 +468,35 @@ export const FinanceProvider = ({ children }) => {
     await updateDoc(getDocRef(), { weddingTasks: updated });
   };
 
+  const updateWeddingTaskBudget = async (taskId, newBudget) => {
+    try {
+      await runTransaction(db, async (transaction) => {
+        const docRef = getDocRef();
+        const docSnap = await transaction.get(docRef);
+        if (!docSnap.exists()) return;
+
+        const data = docSnap.data();
+        const tasks = data.weddingTasks || [];
+        const task = tasks.find(t => t.id === taskId);
+        if (!task) return;
+
+        const diff = Number(newBudget) - Number(task.budgetAllocated);
+        const newOverallBudget = Number(data.weddingOverallBudget || 0) + diff;
+
+        const updatedTasks = tasks.map(t => 
+          t.id === taskId ? { ...t, budgetAllocated: Number(newBudget) } : t
+        );
+
+        transaction.update(docRef, {
+          weddingTasks: updatedTasks,
+          weddingOverallBudget: newOverallBudget
+        });
+      });
+    } catch (error) {
+      console.error("Error updating wedding task budget:", error);
+    }
+  };
+
   const deleteWeddingTask = async (taskId) => {
     const updated = weddingTasks.filter(t => t.id !== taskId);
     await updateDoc(getDocRef(), { weddingTasks: updated });
@@ -861,7 +890,7 @@ export const FinanceProvider = ({ children }) => {
       transactions, addTransaction, deleteTransaction, clearAllTransactions,
       totalIncome, totalExpense, balance, todayExpense,
       goals, addGoal, deleteGoal, addGoalAmount, resetGoalAmount, updateGoal,
-      weddingTasks, addWeddingTask, updateWeddingTask, deleteWeddingTask,
+      weddingTasks, addWeddingTask, updateWeddingTask, updateWeddingTaskBudget, deleteWeddingTask,
       addWeddingExpense, deleteWeddingExpense, toggleWeddingExpensePaid,
       weddingTotalBudget, weddingTotalAllocated, weddingTotalSpent, weddingTotalPaid,
       setWeddingBudget,

@@ -13,7 +13,7 @@ const CATEGORY_COLORS = [
 
 const WeddingPlanner = () => {
   const {
-    weddingTasks, addWeddingTask, deleteWeddingTask,
+    weddingTasks, addWeddingTask, deleteWeddingTask, updateWeddingTaskBudget,
     addWeddingExpense, deleteWeddingExpense, toggleWeddingExpensePaid,
     weddingTotalBudget, weddingTotalAllocated, weddingTotalSpent, weddingTotalPaid,
     setWeddingBudget,
@@ -31,6 +31,10 @@ const WeddingPlanner = () => {
   const [newGroomInvitee, setNewGroomInvitee] = useState({ name: '', count: 1, expectedFunds: 5000 });
   const [editingInviteeId, setEditingInviteeId] = useState(null);
   const [editInviteeData, setEditInviteeData] = useState({ name: '', count: 1, expectedFunds: 0 });
+
+  // Task Budget Editing
+  const [editingTaskBudget, setEditingTaskBudget] = useState(null);
+  const [taskBudgetInput, setTaskBudgetInput] = useState('');
 
   // Add task form
   const [newTask, setNewTask] = useState({ taskName: '', category: 'Venue', budgetAllocated: '' });
@@ -431,14 +435,24 @@ const WeddingPlanner = () => {
                         <h3 style={{ fontSize: '1.1rem' }}>{task.taskName}</h3>
                         <span className="wedding-category-badge">{task.category}</span>
                       </div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                        {formatCurrency(taskSpent)} paid • {task.budgetAllocated - taskSpent > 0 
-                          ? <span style={{ color: 'var(--wedding-primary)' }}>{formatCurrency(task.budgetAllocated - taskSpent)} still to pay</span> 
-                          : task.budgetAllocated - taskSpent < 0 
-                            ? <span style={{ color: 'var(--danger)' }}>Over budget by {formatCurrency(Math.abs(task.budgetAllocated - taskSpent))}</span>
-                            : <span style={{ color: 'var(--success)' }}>Fully paid</span>
-                        } • {task.items.length} items
-                      </div>
+                      {editingTaskBudget === task.id ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }} onClick={e => e.stopPropagation()}>
+                           <input type="number" className="input-field" style={{ padding: '4px 8px', fontSize: '0.85rem', width: '120px' }} value={taskBudgetInput} onChange={e => setTaskBudgetInput(e.target.value)} />
+                           <button onClick={() => { updateWeddingTaskBudget(task.id, taskBudgetInput); setEditingTaskBudget(null); }} style={{ background: 'none', border: 'none', color: 'var(--success)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><Check size={16} /></button>
+                           <button onClick={() => setEditingTaskBudget(null)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><X size={16} /></button>
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          Budget: {formatCurrency(task.budgetAllocated)} 
+                          <button onClick={(e) => { e.stopPropagation(); setTaskBudgetInput(task.budgetAllocated); setEditingTaskBudget(task.id); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 4px', display: 'flex', alignItems: 'center' }}><Edit3 size={14} /></button>
+                          • {formatCurrency(taskSpent)} paid • {task.budgetAllocated - taskSpent > 0 
+                            ? <span style={{ color: 'var(--wedding-primary)' }}>{formatCurrency(task.budgetAllocated - taskSpent)} still to pay</span> 
+                            : task.budgetAllocated - taskSpent < 0 
+                              ? <span style={{ color: 'var(--danger)' }}>Over budget by {formatCurrency(Math.abs(task.budgetAllocated - taskSpent))}</span>
+                              : <span style={{ color: 'var(--success)' }}>Fully paid</span>
+                          } • {task.items.length} items
+                        </div>
+                      )}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       {isExpanded ? <ChevronUp size={20} color="var(--text-muted)" /> : <ChevronDown size={20} color="var(--text-muted)" />}

@@ -1,0 +1,204 @@
+{
+  "transactions": [],
+  "goals": [],
+  "weddingTasks": [
+    {
+      "category": "Venue",
+      "taskName": "Hotel",
+      "items": [
+        {
+          "description": "Advance",
+          "id": "1777457457373",
+          "amount": 10000,
+          "paid": true,
+          "date": "2026-04-29"
+        }
+      ],
+      "id": "1777457430234",
+      "budgetAllocated": 1000000
+    },
+    {
+      "items": [],
+      "budgetAllocated": 150000,
+      "id": "1777457502553",
+      "category": "Attire",
+      "taskName": "Bridal dressing"
+    },
+    {
+      "category": "Attire",
+      "taskName": "Groom",
+      "budgetAllocated": 50000,
+      "id": "1777457527236",
+      "items": []
+    },
+    {
+      "category": "Invitations",
+      "taskName": "Family",
+      "id": "1777457587698",
+      "budgetAllocated": 70000,
+      "items": []
+    },
+    {
+      "id": "1777457684489",
+      "budgetAllocated": 51000,
+      "items": [],
+      "category": "Entertainment",
+      "taskName": "Teatable/transport/cake"
+    },
+    {
+      "category": "Entertainment",
+      "taskName": "Alcohol/bites",
+      "budgetAllocated": 200000,
+      "id": "1777457728762",
+      "items": []
+    },
+    {
+      "category": "Decorations",
+      "taskName": "Wedding cake",
+      "items": [],
+      "budgetAllocated": 30000,
+      "id": "1777457817118"
+    },
+    {
+      "id": "1777457838497",
+      "budgetAllocated": 50000,
+      "items": [],
+      "category": "Entertainment",
+      "taskName": "Honeymoon"
+    },
+    {
+      "category": "Attire",
+      "taskName": "Wedding bands",
+      "items": [
+        {
+          "description": "1st paymnt",
+          "id": "1777457905556",
+          "amount": 120000,
+          "paid": true,
+          "date": "2026-04-29"
+        }
+      ],
+      "id": "1777457877322",
+      "budgetAllocated": 415000
+    },
+    {
+      "category": "Miscellaneous",
+      "taskName": "Jaymngla/Registra",
+      "items": [],
+      "id": "1777458023944",
+      "budgetAllocated": 12500
+    },
+    {
+      "category": "Photography",
+      "taskName": "Photography",
+      "id": "1777458062743",
+      "budgetAllocated": 130000,
+      "items": []
+    }
+  ],
+  "weddingOverallBudget": 2160000,
+  "loans": [],
+  "appName": "Gim & Nippi Budget",
+  "incomeCategories": [
+    "Salary",
+    "Fiverr",
+    "Investment",
+    "Other Income"
+  ],
+  "expenseCategories": [
+    "Housing",
+    "Food",
+    "Groceries",
+    "Transportation",
+    "Utilities",
+    "Insurance",
+    "Medical",
+    "Saving",
+    "Personal",
+    "Debt",
+    "Wedding",
+    "Other Expense",
+    "loan",
+    "bills",
+    "nip home",
+    "gim mom",
+    "family",
+    "nip staying"
+  ],
+  "creditCards": [
+    {
+      "transactions": [
+        {
+          "date": "2026-04-26",
+          "description": "VGA",
+          "amount": 50000,
+          "id": "1777179176680",
+          "type": "payment"
+        }
+      ],
+      "balance": 50000,
+      "name": "NDB",
+      "limit": 100000,
+      "id": "1777173457174"
+    },
+    {
+      "id": "1777179218187",
+      "limit": 50000,
+      "balance": 12500,
+      "name": "HNB Nip",
+      "transactions": [
+        {
+          "amount": 12500,
+          "type": "payment",
+          "id": "1777280062306",
+          "description": "Aa",
+          "date": "2026-04-27"
+        },
+        {
+          "date": "2026-04-26",
+          "description": "aa",
+          "amount": 12500,
+          "type": "repayment",
+          "id": "1777179313780"
+        },
+        {
+          "date": "2026-04-26",
+          "description": "aaa",
+          "amount": 12500,
+          "id": "1777179306366",
+          "type": "payment"
+        }
+      ]
+    },
+    {
+      "balance": 5200,
+      "name": "HNB Gim",
+      "transactions": [
+        {
+          "id": "1777280078494",
+          "type": "payment",
+          "amount": 5200,
+          "description": "Aa",
+          "date": "2026-04-27"
+        },
+        {
+          "type": "repayment",
+          "id": "1777179421066",
+          "amount": 5100,
+          "description": "1",
+          "date": "2026-04-26"
+        },
+        {
+          "date": "2026-04-26",
+          "description": "2",
+          "id": "1777179412976",
+          "type": "payment",
+          "amount": 5100
+        }
+      ],
+      "limit": 50000,
+      "id": "1777179239259"
+    }
+  ],
+  "exportedAt": "2026-04-29T10:32:34.981Z"
+}
