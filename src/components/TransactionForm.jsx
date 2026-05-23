@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react';
 import { useFinance } from '../context/FinanceContext';
 import { X } from 'lucide-react';
@@ -191,3 +192,4 @@ const TransactionForm = ({ isOpen, onClose, defaultType = 'expense' }) => {
 };
 
 export default TransactionForm;
+

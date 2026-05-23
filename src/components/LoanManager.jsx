@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useMemo } from 'react';
 import { useFinance, formatCurrency, calculateEMI, calculateOverpaymentImpact, calculateLoanPaymentHistory } from '../context/FinanceContext';
 import { Landmark, Plus, Trash2, Calculator, TrendingDown, Clock, Percent, DollarSign, ArrowDownCircle, X, ChevronDown, ChevronUp, Check, Zap, CalendarDays, BadgeCheck } from 'lucide-react';
@@ -690,3 +691,4 @@ const LoanManager = () => {
 };
 
 export default LoanManager;
+

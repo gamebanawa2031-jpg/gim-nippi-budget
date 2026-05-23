@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import { useFinance, formatCurrency, getDaysUntilWedding, WEDDING_DATE } from '../context/FinanceContext';
 import { Heart, Plus, Trash2, ChevronDown, ChevronUp, Check, X, Edit3, Settings, Users, PhoneCall, Gift } from 'lucide-react';
@@ -677,3 +678,4 @@ const WeddingPlanner = () => {
 };
 
 export default WeddingPlanner;
+

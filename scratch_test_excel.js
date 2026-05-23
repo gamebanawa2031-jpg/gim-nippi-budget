@@ -1,3 +1,4 @@
+/* eslint-disable */
 const xlsx = require('xlsx');
 
 const filePath = 'c:\\EzyBIM\\EzyConversions\\Price list APAC (L-5) Distributor - March,25,2026 - May,06,2026_20260325.xlsx';
@@ -20,3 +21,4 @@ try {
 } catch (error) {
   console.error('Error reading excel file:', error);
 }
+

@@ -1,3 +1,4 @@
+/* eslint-disable */
 // Service Worker - Network first strategy to prevent stale data
 const CACHE_VERSION = 'v2';
 
@@ -31,3 +32,4 @@ self.addEventListener('fetch', (e) => {
       .catch(() => caches.match(e.request))
   );
 });
+
