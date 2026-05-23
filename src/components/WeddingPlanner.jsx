@@ -420,7 +420,7 @@ const WeddingPlanner = () => {
             {weddingTasks.map(task => {
               const taskSpent = task.items.reduce((s, i) => s + Number(i.amount), 0);
               const taskPaid = task.items.filter(i => i.paid).reduce((s, i) => s + Number(i.amount), 0);
-              const taskProgress = task.budgetAllocated > 0 ? (taskSpent / task.budgetAllocated) * 100 : 0;
+              const taskProgress = task.budgetAllocated > 0 ? (taskPaid / task.budgetAllocated) * 100 : 0;
               const isExpanded = expandedTask === task.id;
               const catIndex = WEDDING_CATEGORIES.indexOf(task.category);
 
@@ -446,10 +446,10 @@ const WeddingPlanner = () => {
                         <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                           Budget: {formatCurrency(task.budgetAllocated)} 
                           <button onClick={(e) => { e.stopPropagation(); setTaskBudgetInput(task.budgetAllocated); setEditingTaskBudget(task.id); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '0 4px', display: 'flex', alignItems: 'center' }}><Edit3 size={14} /></button>
-                          • {formatCurrency(taskSpent)} paid • {task.budgetAllocated - taskSpent > 0 
-                            ? <span style={{ color: 'var(--wedding-primary)' }}>{formatCurrency(task.budgetAllocated - taskSpent)} still to pay</span> 
-                            : task.budgetAllocated - taskSpent < 0 
-                              ? <span style={{ color: 'var(--danger)' }}>Over budget by {formatCurrency(Math.abs(task.budgetAllocated - taskSpent))}</span>
+                          • {formatCurrency(taskPaid)} paid • {task.budgetAllocated - taskPaid > 0 
+                            ? <span style={{ color: 'var(--wedding-primary)' }}>{formatCurrency(task.budgetAllocated - taskPaid)} still to pay</span> 
+                            : task.budgetAllocated - taskPaid < 0 
+                              ? <span style={{ color: 'var(--danger)' }}>Over budget by {formatCurrency(Math.abs(task.budgetAllocated - taskPaid))}</span>
                               : <span style={{ color: 'var(--success)' }}>Fully paid</span>
                           } • {task.items.length} items
                         </div>
