@@ -22,12 +22,15 @@ const Insights = () => {
       const text = await file.text();
       const confirmed = window.confirm(`Restore backup from "${file.name}"? This will overwrite current data with the backup.`);
       if (!confirmed) return;
-      const success = await importAllData(text);
-      if (success) {
+      const result = await importAllData(text);
+      if (result === true || (result && result.success)) {
         alert('✅ Data restored successfully! The page will now refresh.');
         window.location.reload();
       } else {
-        alert('❌ Import failed. Please check the file format.');
+        const errorMsg = (result && typeof result === 'object' && result.error)
+          ? result.error
+          : 'Please check the file format.';
+        alert('❌ Import failed: ' + errorMsg);
       }
     } catch (err) {
       alert('❌ Error reading file: ' + err.message);

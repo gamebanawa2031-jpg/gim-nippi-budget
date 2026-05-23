@@ -735,6 +735,16 @@ export const FinanceProvider = ({ children }) => {
   const importAllData = async (jsonData) => {
     try {
       const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+      const keys = [
+        'transactions', 'goals', 'weddingTasks', 'weddingInvitees',
+        'weddingOverallBudget', 'loans', 'appName', 'incomeCategories',
+        'expenseCategories', 'creditCards'
+      ];
+      const hasValidKey = data && typeof data === 'object' && keys.some(key => key in data);
+      if (!hasValidKey) {
+        throw new Error("Invalid backup file: does not contain any valid budget data fields.");
+      }
+
       const updatePayload = {};
       if (data.transactions) updatePayload.transactions = data.transactions;
       if (data.goals) updatePayload.goals = data.goals;
@@ -746,11 +756,12 @@ export const FinanceProvider = ({ children }) => {
       if (data.incomeCategories) updatePayload.incomeCategories = data.incomeCategories;
       if (data.expenseCategories) updatePayload.expenseCategories = data.expenseCategories;
       if (data.creditCards) updatePayload.creditCards = data.creditCards;
-      await updateDoc(getDocRef(), updatePayload);
-      return true;
+      
+      await setDoc(getDocRef(), updatePayload, { merge: true });
+      return { success: true };
     } catch (error) {
       console.error('Import failed:', error);
-      return false;
+      return { success: false, error: error.message };
     }
   };
 
@@ -813,11 +824,10 @@ export const FinanceProvider = ({ children }) => {
   const weddingTotalSpent = weddingTasks.reduce((acc, t) => acc + t.items.reduce((s, i) => s + Number(i.amount), 0), 0);
   const weddingTotalPaid = weddingTasks.reduce((acc, t) => acc + t.items.filter(i => i.paid).reduce((s, i) => s + Number(i.amount), 0), 0);
 
-  // ===== RESTORE FROM LOCAL BACKUP =====
   const restoreFromLocalBackup = async () => {
     try {
       const localBackupRaw = localStorage.getItem(BACKUP_KEY);
-      if (!localBackupRaw) return false;
+      if (!localBackupRaw) return { success: false, error: "No local backup found" };
       const backupData = JSON.parse(localBackupRaw);
       const updatePayload = {};
       if (backupData.transactions) updatePayload.transactions = backupData.transactions;
@@ -830,13 +840,13 @@ export const FinanceProvider = ({ children }) => {
       if (backupData.incomeCategories) updatePayload.incomeCategories = backupData.incomeCategories;
       if (backupData.expenseCategories) updatePayload.expenseCategories = backupData.expenseCategories;
       if (backupData.creditCards) updatePayload.creditCards = backupData.creditCards;
-      await updateDoc(getDocRef(), updatePayload);
+      await setDoc(getDocRef(), updatePayload, { merge: true });
       setBackupAvailable(false);
       setLocalBackupInfo(null);
-      return true;
+      return { success: true };
     } catch (error) {
       console.error('[Auto-Backup] Restore failed:', error);
-      return false;
+      return { success: false, error: error.message };
     }
   };
 

@@ -23,12 +23,15 @@ function DataRecoveryBanner() {
 
   const handleRestore = async () => {
     setRestoring(true);
-    const success = await restoreFromLocalBackup();
-    if (success) {
+    const result = await restoreFromLocalBackup();
+    if (result === true || (result && result.success)) {
       // Data will auto-sync via onSnapshot, no reload needed
       setRestoring(false);
     } else {
-      alert('Restore failed. Please try the manual restore in Insights → Backup & Restore.');
+      const errorMsg = (result && typeof result === 'object' && result.error)
+        ? `: ${result.error}`
+        : '';
+      alert(`Restore failed${errorMsg}. Please try the manual restore in Insights → Backup & Restore.`);
       setRestoring(false);
     }
   };
